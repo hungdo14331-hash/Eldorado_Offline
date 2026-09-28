@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>BUSIDOL Wiki</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div class="wiki-layout">
+
+    <!-- ======================================================
+         SIDEBAR
+    ======================================================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+            <h1>BUSIDOL</h1>
+            <span>Game Wiki</span>
+        </div>
+
+
+        <nav class="main-nav">
+
+            <button
+                class="nav-button active"
+                data-view="characters"
+                type="button"
+            >
+                Nhân vật
+            </button>
+
+            <button
+                class="nav-button"
+                data-view="missile"
+                type="button"
+            >
+                Tên lửa
+            </button>
+
+            <button
+                class="nav-button"
+                data-view="tower"
+                type="button"
+            >
+                Tòa tháp
+            </button>
+
+        </nav>
+
+
+        <div class="sidebar-info">
+
+            <div>
+                <span>Characters</span>
+                <strong id="sidebarCharacterCount">0</strong>
+            </div>
+
+            <div>
+                <span>Missile Max Lv</span>
+                <strong>160</strong>
+            </div>
+
+            <div>
+                <span>Tower Max Lv</span>
+                <strong>160</strong>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+
+    <!-- ======================================================
+         MAIN
+    ======================================================= -->
+
+    <main class="main-content">
+
+
+        <!-- ==================================================
+             CHARACTER VIEW
+        =================================================== -->
+
+        <section
+            id="charactersView"
+            class="wiki-view active"
+        >
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">
+                        CHARACTER DATABASE
+                    </p>
+
+                    <h2>
+                        Nhân vật
+                    </h2>
+
+                    <p class="page-description">
+                        Dữ liệu nhân vật, Base AP, Base HP và bảng sức mạnh theo từng level.
+                    </p>
+                </div>
+
+                <div class="result-count">
+                    <strong id="characterCount">0</strong>
+                    <span>nhân vật</span>
+                </div>
+
+            </header>
+
+
+            <!-- SEARCH -->
+
+            <div class="toolbar">
+
+                <input
+                    id="searchInput"
+                    class="search-input"
+                    type="search"
+                    placeholder="Tìm theo tên, ID, asset..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <!-- STAR FILTER -->
+
+            <div
+                id="starFilter"
+                class="star-filter"
+            >
+
+                <button
+                    class="star-button active"
+                    data-star="all"
+                    type="button"
+                >
+                    Tất cả
+                </button>
+
+                <button class="star-button" data-star="1" type="button">1★</button>
+                <button class="star-button" data-star="2" type="button">2★</button>
+                <button class="star-button" data-star="3" type="button">3★</button>
+                <button class="star-button" data-star="4" type="button">4★</button>
+                <button class="star-button" data-star="5" type="button">5★</button>
+                <button class="star-button" data-star="6" type="button">6★</button>
+                <button class="star-button" data-star="7" type="button">7★</button>
+                <button class="star-button" data-star="8" type="button">8★</button>
+                <button class="star-button" data-star="9" type="button">9★</button>
+
+            </div>
+
+
+            <!-- CARDS -->
+
+            <div
+                id="characterGrid"
+                class="character-grid"
+            ></div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             MISSILE VIEW
+        =================================================== -->
+
+        <section
+            id="missileView"
+            class="wiki-view"
+        >
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">
+                        MISSILE DATABASE
+                    </p>
+
+                    <h2>
+                        Tên lửa
+                    </h2>
+
+                    <p class="page-description">
+                        Base Power theo level. Chưa cộng Medal Power hoặc modifier chiến đấu.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="system-summary">
+
+                <div class="system-card">
+                    <span>Max Level</span>
+                    <strong>160</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>Power Lv.1</span>
+                    <strong id="missileLv1Power">100</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>Power Lv.160</span>
+                    <strong id="missileMaxPower">740</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>Công thức</span>
+                    <strong>100 + 4 × Lv</strong>
+                </div>
+
+            </div>
+
+
+            <div class="table-toolbar">
+
+                <input
+                    id="missileLevelSearch"
+                    class="search-input"
+                    type="number"
+                    min="1"
+                    max="160"
+                    placeholder="Nhập level 1 - 160"
+                >
+
+            </div>
+
+
+            <div class="data-table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Base Power</th>
+                            <th>Visual Tier</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="missileTableBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- ==================================================
+             TOWER VIEW
+        =================================================== -->
+
+        <section
+            id="towerView"
+            class="wiki-view"
+        >
+
+            <header class="page-header">
+
+                <div>
+                    <p class="eyebrow">
+                        TOWER DATABASE
+                    </p>
+
+                    <h2>
+                        Tòa tháp
+                    </h2>
+
+                    <p class="page-description">
+                        Base HP theo level. Tháp Awaken có HP cố định 5,000,000.
+                    </p>
+                </div>
+
+            </header>
+
+
+            <div class="system-summary">
+
+                <div class="system-card">
+                    <span>Max Level</span>
+                    <strong>160</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>HP Lv.1</span>
+                    <strong id="towerLv1Hp">75</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>HP Lv.160</span>
+                    <strong id="towerMaxHp">384,060</strong>
+                </div>
+
+                <div class="system-card">
+                    <span>Awaken HP</span>
+                    <strong>5,000,000</strong>
+                </div>
+
+            </div>
+
+
+            <div class="table-toolbar">
+
+                <input
+                    id="towerLevelSearch"
+                    class="search-input"
+                    type="number"
+                    min="1"
+                    max="160"
+                    placeholder="Nhập level 1 - 160"
+                >
+
+            </div>
+
+
+            <div class="data-table-wrapper">
+
+                <table class="data-table">
+
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Base HP</th>
+                            <th>Visual Tier</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="towerTableBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+
+<!-- ==========================================================
+     CHARACTER MODAL
+=========================================================== -->
+
+<div
+    id="characterModal"
+    class="character-modal"
+>
+
+    <div class="modal-backdrop"></div>
+
+
+    <div class="modal-panel">
+
+        <button
+            id="closeModal"
+            class="modal-close"
+            type="button"
+            aria-label="Đóng"
+        >
+            ×
+        </button>
+
+
+        <div class="detail-top">
+
+            <div class="detail-image-wrap">
+
+                <img
+                    id="detailImage"
+                    alt=""
+                >
+
+            </div>
+
+
+            <div class="detail-heading">
+
+                <div
+                    id="detailStars"
+                    class="character-stars"
+                ></div>
+
+                <h2 id="detailName"></h2>
+
+                <div class="detail-meta">
+
+                    <div>
+                        <span>ID</span>
+                        <strong id="detailId"></strong>
+                    </div>
+
+                    <div>
+                        <span>Max Level</span>
+                        <strong id="detailMaxLevel"></strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-stats">
+
+            <div>
+                <span>HP Start</span>
+                <strong id="detailHpStart"></strong>
+            </div>
+
+            <div>
+                <span>HP Max</span>
+                <strong id="detailHpEnd"></strong>
+            </div>
+
+            <div>
+                <span>AP Start</span>
+                <strong id="detailApStart"></strong>
+            </div>
+
+            <div>
+                <span>AP Max</span>
+                <strong id="detailApEnd"></strong>
+            </div>
+
+        </div>
+
+
+        <div class="detail-table-wrap">
+
+            <h3>
+                Sức mạnh theo từng level
+            </h3>
+
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Level</th>
+                        <th>Base AP</th>
+                        <th>Base HP</th>
+                    </tr>
+                </thead>
+
+                <tbody id="levelTableBody"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ==========================================================
+     DATA
+=========================================================== -->
+
+<script src="data/characters.js"></script>
+<script src="data/missile_tower_data.js"></script>
+
+<!-- APP PHẢI LOAD CUỐI -->
+<script src="js/app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<!-- html manifest="./cache.appcache" -->
+<html>
+
+<head>
+	<!--meta name="viewport" content="width=1280"/-->
+	<meta name="viewport" content="width=device-width,  initial-scale=1.0 maximum-scale=1 user-scalable=no">
+	<!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
+
+	<meta name="description" content="Find the golden city with your friends! ">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="expires" content="0" />
+
+	<title>El Dorado</title>
+
+	<link rel="stylesheet" href="css/Main.css" type="text/css">
+	<script type="text/javascript" src="lib/jquery-2.1.3.min.js"></script>
+	<script language="javascript" type="text/javascript" src="loader.js?20210302_3"></script>
+
+
+
+	<!--  history.back key를 막기 위한 처리 -->
+	<script type="text/javascript">
+		(function (root) {
+			root.addEventListener('keydown', function (e) {
+				if (e.keyCode == 8) {
+					e.preventDefault();
+				}
+
+				if (e.keyCode == 123 /* F12 */) {
+					e.preventDefault();
+					e.returnValue = false;
+					//alert("oh no!");
+				}
+			});
+		}(window));
+
+
+		function click() {
+			if (event.button == 2) {
+
+				//alert("우측버턴 앙돼요~!");
+				event.preventDefault();
+
+			}
+		}
+		document.onmousedown = click;
+
+	</script>
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+	<script>
+		(adsbygoogle = window.adsbygoogle || []).push({
+			google_ad_client: "ca-pub-9128981968156075",
+			enable_page_level_ads: true
+		});
+	</script>
+
+</head>
+
+<body marginwidth="0" marginheight="0"
+	leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0" scroll="no" ondragstart="return false"
+	draggable="false" onselectstart="return false" oncontextmenu="return false;">
+
+	<img id="SafeZone">
+
+	<div id="div_body">
+		<div id="S_LOGO_div"></div>
+		<div id="S_SYNOPSIS_div"></div>
+		<div id="S_MAINMENU_div"></div>
+		<div id="S_ATTENDANCE_div"></div>
+		<div id="S_SELECTMAP_div"></div>
+		<div id="S_SELECTSTAGE_div"></div>
+		<!-- <div id="S_USERPAID_div"></div> -->
+		<div id="S_RANKING_div"></div>
+		<div id="S_RANKING_PVP_div"></div>
+		<div id="S_MEDALPOWER_div"></div>
+		<div id="S_MAKETEAM_div"></div>
+		<div id="S_CLEVELUP_div"></div>
+		<div id="S_CLEVELUP_COMPLETE_div"></div>
+		<div id="S_EVOLUTION_COMPLETE_div"></div>
+		<div id="S_UPGRADE_div"></div>
+		<div id="S_UPGRADE_COMPLETE_div"></div>
+		<div id="S_GACHA_div"></div>
+		<div id="S_GACHA_COMPLETE_div"></div>
+		<div id="S_MARKETSTORE_div"></div>
+		<div id="S_EVENT_div"></div>
+		<div id="S_GAME_div"></div>
+
+		<div id="S_QUEST_div"></div>
+		<div id="S_QUESTDETAIL_div"></div>
+
+		<!-- 20170704_yhlee  도감 추가로 인하여 추가합니다. 20191119_chkim-->
+		<div id="S_CHARBOOK_ALLY_div"></div>
+		<div id="S_CHARBOOK_ALLY_POPUP_div"></div>
+		<div id="S_CHARBOOK_ENEMY_div"></div>
+
+		<div id="MM_top">
+			<img id="Img_MM_top_levelbar">
+			<img id="Img_MM_top_goldbar">
+			<img id="Img_MM_top_rubybar">
+			<img id="Img_MM_top_photo">
+			<img id='Img_MM_top_bonus_point'>
+			<div id='MM_top_bonus_point_div'></div>
+
+			<div id="Txt_MM_top_level"></div>
+			<div id="Txt_MM_top_exp"></div>
+			<div id="Img_MM_top_exp_charge">
+				<div id="Img_MM_top_exp_progress"> </div>
+			</div>
+
+			<div id="Txt_MM_top_gold"></div>
+			<div id="Txt_MM_top_ruby"></div>
+		</div> <!-- end of MM_top -->
+		<div id="S_USERGUIDE_div"></div>
+
+		<div id="S_STAGECLEAR_div"></div>
+		<div id="S_STAGEFAIL_div"></div>
+		<div id="S_EVENTPAGE_div"></div>
+		<div id="S_SETTING_div"></div>
+		<div id="S_INPUT_NICKNAME_div"></div>
+		<div id="S_BILLING_HISTORY_div"></div>
+		<div id="S_QUEST_div"></div>
+		<div id="S_QUESTDETAIL_div"></div>
+		<div id="S_POPUPYN_div"></div>
+		<div id="S_GONGJI_div"></div>
+		<div id="S_PAYMENT_CNM_div"></div>
+
+		<div id="S_EXITPOPUP_div"></div>
+		<div id="S_USERPAID_div"></div>
+
+		<div id="effect_div">
+			<canvas id="e_c_div"></canvas>
+		</div>
+		<div id="temp_text"></div>
+		<div id="LOGLOG"></div>
+		<div id="show_frame_num"> </div>
+		<div id="PM_here"></div>
+		<div id="message"></div>
+		<div id="LO_loading" class="loader"></div>
+		<div id="realtime_notice"></div>
+
+		<div class="fb-like" data-layout="button_count" data-action="like" data-size="large" data-show-faces="true"
+			data-share="true" style="left:990px;top:147px;position:absolute;display:none"></div>
+		<!--div id="TESTING"></div -->
+	</div><!-- End of "div_body" -->
+
+
+
+	<!-- for FACEBOOK  좋아요, 공유하기 달기 -->
+
+	<!--
+		  Below we include the Login Button social plugin. This button uses
+		  the JavaScript SDK to present a graphical Login button that triggers
+		  the FB.login() function when clicked.
+		-->
+
+	<!-- fb:login-button scope="public_profile,email" onlogin="">
+		</fb:login-button -->
+
+	<!-- div
+			class ="fb-login-button"
+			data-max=rows="1"
+			data-size ="large"
+			data-auto-logout-link = "true"
+			data-show-faces ="true"
+		></div -->
+
+	<div id="status"></div>
+	<!-- for FACEBOOK -->
+	<img id="rotate_screen"></div>
+	<!-- ==== LIEN KET NHANH: TikTok Lines (self-host, khong can khoi-dong lai) ==== -->
+	<style>
+		#quicklinks_resi a, #quicklinks_resi button {
+			padding: 4px 8px; font-size: 7px; border-radius: 13px;
+			opacity: .5; transition: opacity .15s;
+		}
+		#quicklinks_resi a:hover, #quicklinks_resi button:hover {
+			opacity: 1;
+		}
+	</style>
+	<div id="quicklinks_resi" style="position:fixed;left:6px;bottom:8px;z-index:999999;display:flex;flex-direction:column;gap:4px;font-family:Arial,Helvetica,sans-serif;">
+		<button type="button" id="btn_2x" style="background:#3a3a3a;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">⚡ 2x TẮT</button>
+		<a href="../rubyfarm.html" target="_blank"
+			style="background:#7b2b8e;color:#fff;text-align:center;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">🔮 VƯỜN RUBY</a>
+		<a href="../convert.html" target="_blank"
+			style="background:#0e7a5f;color:#fff;text-align:center;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">🔄 ĐỔI TN</a>
+	</div>
+
+	<script>
+		/* Fit-to-screen cho ELDORADO: scale #div_body theo cửa sổ, căn giữa 2 trục.
+		   Loader gốc chỉ áp scale trong nhánh có ad-box; offline không có ad-box
+		   nên k=NaN → không bao giờ scale → game lệch trái trên. Script này chạy
+		   độc lập, kích thước tính lại mỗi resize (chia đôi màn hình). */
+		(function () {
+			var lastW = -1, lastH = -1;
+			function fit() {
+				var vw = window.innerWidth || document.documentElement.clientWidth || 1280;
+				var vh = window.innerHeight || document.documentElement.clientHeight || 640;
+				document.body.style.background = "#000";
+				var db = document.getElementById("div_body");
+				if (!db) return;
+				if (vw === lastW && vh === lastH) { return; }
+				lastW = vw; lastH = vh;
+				var s = Math.min(vw / 1280, vh / 720);
+				var w = 1280 * s, h = 720 * s;
+				var L = Math.max(0, Math.round((vw - w) / 2));
+				var T = Math.max(0, Math.round((vh - h) / 2));
+				$(db).css({
+					left: L + "px", top: T + "px",
+					width: w + "px", height: h + "px",
+					transform: "scale(" + s + ")",
+					"-ms-transform": "scale(" + s + ")",
+					"-webkit-transform": "scale(" + s + ")",
+					"transform-origin": "0 0",
+					"-webkit-transform-origin": "0 0"
+				});
+			}
+			function onResize() { clearTimeout(onResize.__t); onResize.__t = setTimeout(fit, 120); }
+			window.addEventListener("resize", onResize);
+			window.addEventListener("orientationchange", onResize);
+			// chờ loader chèn xong #div_body rồi mới fit lần đầu
+			var t = setInterval(function () {
+				if (document.getElementById("div_body")) { fit(); clearInterval(t); }
+			}, 60);
+			setTimeout(fit, 800);  // lỡ loader vẽ sau cùng
+		})();
+	</script>
+
+	<script>
+		/* ⚡ 2x SPEED: bọc setInterval/setTimeout trước khi game core spawn.
+		   Bật → delay ngắn (<=4000ms) chia đôi, re-arm toàn bộ interval sống.
+		   Timer thật (email/guild/refresh/sound) giữ nguyên qua isRealtime. */
+		(function () {
+			if (window.__ELD_2X__) return;
+			window.__ELD_2X__ = true;
+			var __oSI = window.setInterval, __oCI = window.clearInterval, __oST = window.setTimeout, __oCT = window.clearTimeout;
+			window.__2X_ON__ = false;
+			window.__2X_LOG__ = [];
+			var __reg = {};
+			var __hi = 4000;
+			function isRealtime(fn) {
+				var s;
+				try { s = fn.toString(); } catch (e) { return false; }
+				return /email_vaild_time|interval_update_remaintime|refresh_all|sound_bgm/.test(s);
+			}
+			function off(fn, ms) {
+				var rt = isRealtime(fn);
+				var fast = !rt && ms > 0 && ms <= __hi;
+				return fast ? Math.max(1, Math.round(ms / 2)) : ms;
+			}
+			function log(what, ms, orig, id, rt) {
+				if (window.__2X_LOG__.length > 200) window.__2X_LOG__.shift();
+				window.__2X_LOG__.push(what + "|" + orig + "|" + ms + "|" + id + "|" + (rt ? "RT" : "game"));
+			}
+			function wrapSI(fn, ms) {
+				var base = ms;
+				var rt = isRealtime(fn);
+				var id = __oSI(fn, off(fn, base));
+				__reg[id] = { fn: fn, ms: base, live: true, rt: rt };
+				if (window.__2X_ON__) log("I", base, ms, id, rt);
+				return id;
+			}
+			function applyAll() {
+				for (var id in __reg) {
+					var e = __reg[id];
+					if (!e.live) continue;
+					var want = (window.__2X_ON__ && e.ms > 0 && e.ms <= __hi && !e.rt) ? Math.max(1, Math.round(e.ms / 2)) : e.ms;
+					__oCI(id);
+					var nid = __oSI(e.fn, want);
+					delete __reg[id];
+					__reg[nid] = e;
+					e.live = true;
+				}
+			}
+			function oCIreal(id) { if (__reg[id]) __reg[id].live = false; return __oCI(id); }
+			function wrapST(fn, ms) {
+				var rt = isRealtime(fn);
+				var base = ms;
+				var id = __oST(fn, off(fn, base));
+				if (window.__2X_ON__) log("T", base, ms, id, rt);
+				return id;
+			}
+			try {
+				Object.defineProperty(window, "setInterval", { configurable: true, enumerable: false, writable: true, value: wrapSI });
+				Object.defineProperty(window, "clearInterval", { configurable: true, enumerable: false, writable: true, value: oCIreal });
+				Object.defineProperty(window, "setTimeout", { configurable: true, enumerable: false, writable: true, value: wrapST });
+			} catch (e) {
+				window.setInterval = wrapSI;
+				window.clearInterval = oCIreal;
+				window.setTimeout = wrapST;
+			}
+			var b = document.getElementById("btn_2x");
+			if (b) {
+				function upd() {
+					b.textContent = window.__2X_ON__ ? "⚡ 2x BẬT" : "⚡ 2x TẮT";
+					b.style.background = window.__2X_ON__ ? "#8a2c9e" : "#3a3a3a";
+				}
+				b.onclick = function () {
+					window.__2X_ON__ = !window.__2X_ON__;
+					if (window.__2X_ON__) { applyAll(); console.log("[2X] LOG:", window.__2X_LOG__); }
+					upd();
+				};
+				upd();
+			}
+		})();
+	</script>
+	<script>
+		// Item gacha: chọn loại (1=Đồng hồ, 2=Kiếm, 3=Khiên, 4=Cánh) + ép grade B/A/S.
+		// Core item id = [loại][grade][biến thể]; grade hàng chục 5/6/7 = B/A/S.
+		// Không sửa min.js -> override runtime.
+		(function () {
+			function ensureWrap() {
+				var c = window.S_ITEM_GACHA_COMPLETE;
+				if (!c || !c.calculate || c.__eldIG) return;
+				var orig = c.calculate;
+				c.calculate = function () {
+					orig.apply(this, arguments);
+					var sel = window.__item_gacha_type; // 1..4 hoặc undefined
+					var how = (typeof ITEM_GACHA_HOW_MANY === "number") ? ITEM_GACHA_HOW_MANY : 6;
+					for (var n = 1; n <= how; n++) {
+						var r = ITEM_GACHARESULT && ITEM_GACHARESULT[n];
+						if (!r || !r.item_num) continue;
+						var t = r.item_num;
+						var type = Math.floor(t / 100);      // 1..4
+						var v = t % 10;                       // 1..3
+						if (sel) type = sel;
+						var grade = 5 + Math.floor(Math.random() * 3); // 5,6,7 = B,A,S
+						r.item_num = type * 100 + grade * 10 + v;
+					}
+				};
+				c.__eldIG = true;
+				console.log("[ITEM_GACHA] calculate wrapped");
+			}
+			ensureWrap();
+			setInterval(ensureWrap, 500);
+
+			// Panel 4 nút chọn loại, hiện khi mở màn gacha item.
+			var names = ["1 ĐỒNG HỒ", "2 KIẾM", "3 KHIÊN", "4 CÁNH"];
+			var colors = ["#4169e1", "#c0392b", "#1e8449", "#a04000"];
+			var panel = document.createElement("div");
+			panel.id = "item_gacha_type_panel";
+			panel.style.cssText = "position:fixed;left:10px;top:180px;z-index:999999;display:none;" +
+				"flex-direction:column;gap:6px;background:rgba(0,0,0,.55);padding:8px;border-radius:10px;font-family:Arial,Helvetica,sans-serif;";
+			var status = document.createElement("div");
+			status.id = "item_gacha_ep_status";
+			status.style.cssText = "font:bold 12px Arial;color:#fff;text-align:center;padding:3px;border-radius:6px;background:#333;";
+			status.textContent = "EP GRADE: ...";
+			panel.appendChild(status);
+			names.forEach(function (nm, i) {
+				var b = document.createElement("button");
+				b.type = "button";
+				b.textContent = nm;
+				b.dataset.type = i + 1;
+				b.style.cssText = "padding:6px 12px;border:none;border-radius:8px;cursor:pointer;" +
+					"font-size:13px;font-weight:700;color:#fff;background:" + colors[i] + ";box-shadow:0 2px 6px rgba(0,0,0,.5);";
+				b.addEventListener("click", function () {
+					window.__item_gacha_type = Number(this.dataset.type);
+					var all = panel.querySelectorAll("button");
+					for (var j = 0; j < all.length; j++) all[j].style.outline = (all[j] === this) ? "3px solid #fff" : "none";
+					console.log("[ITEM_GACHA] type=" + this.textContent);
+				});
+				panel.appendChild(b);
+			});
+			document.body.appendChild(panel);
+
+			setInterval(function () {
+				var d = document.getElementById("S_ITEM_GACHA_div");
+				var d2 = document.getElementById("S_GACHA_div");
+				var show = window.S_ITEM_GACHA !== undefined &&
+					((d && d.style.display !== "none") ||
+					 (d2 && d2.style.display !== "none" && window.S_GACHA && S_GACHA.item_gacha_mode));
+				panel.style.display = show ? "flex" : "none";
+				var c = window.S_ITEM_GACHA_COMPLETE;
+				var wrapped = !!(c && c.__eldIG);
+				status.textContent = wrapped ? "EP GRADE: BẬT (B/A/S)" : "EP GRADE: TẮT";
+				status.style.background = wrapped ? "#1e8449" : "#b00020";
+			}, 200);
+		})();
+	</script>
+	<script>
+		// Autoplay giá 1000 BP (core AUDOPLAY.need_bp=10 cố định trong min.js,
+		// không sửa min.js -> override runtime). Poll cho tới khi core init xong.
+		(function () {
+			var t = setInterval(function () {
+				if (window.AUTOPLAY) {
+					AUTOPLAY.need_bp = 1000;
+					clearInterval(t);
+					console.log("[AUTOPLAY] need_bp=1000");
+				}
+			}, 200);
+		})();
+	</script>
+
+</body>
+
+</html>
+

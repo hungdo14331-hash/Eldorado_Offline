@@ -1,0 +1,615 @@
+<style>
+  /* Deliberate single dark world: the trainer lives in the same perpetual fog
+     as the thing it drills for, so the palette does not flip for light mode —
+     only contrast and glow are tuned per-scheme. */
+  :root{
+    --bg:#0a0b0a;
+    --bg-2:#111312;
+    --panel:#181a18;
+    --panel-2:#1f2220;
+    --rivet:#2b2e2b;
+    --line:#33362f;
+    --ink:#ece6d6;
+    --ink-dim:#9d9a8c;
+    --ink-faint:#6b695f;
+    --blood:#9c2430;
+    --blood-dim:#5c1820;
+    --gold:#d7a83c;
+    --gold-dim:#8a6a26;
+    --good:#e9e4d2;
+    --shadow:0 20px 60px -20px rgba(0,0,0,.8);
+    --font-display:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Noto Serif',serif;
+    --font-body:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+    --font-mono:ui-monospace,'Cascadia Mono','SFMono-Regular',Consolas,'Liberation Mono',monospace;
+  }
+  :root[data-theme="light"]{
+    --bg:#141513;
+    --bg-2:#1a1c19;
+    --panel:#1e211e;
+    --panel-2:#252825;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+  }
+
+  *{ box-sizing:border-box; }
+  body{ margin:0; }
+
+  .stage{
+    min-height:100vh;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #1c1e1a 0%, transparent 55%),
+      radial-gradient(160% 120% at 50% 115%, #000 0%, transparent 60%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .fog{
+    position:absolute; inset:-10%;
+    background:
+      radial-gradient(38% 30% at 20% 20%, rgba(156,36,48,.05), transparent 60%),
+      radial-gradient(45% 35% at 85% 80%, rgba(215,168,60,.04), transparent 60%);
+    animation:drift 26s ease-in-out infinite alternate;
+    pointer-events:none;
+  }
+  @keyframes drift{ from{ transform:translate3d(0,0,0) scale(1);} to{ transform:translate3d(-2%,1.5%,0) scale(1.04);} }
+
+  .plate{
+    position:relative;
+    width:min(980px, 100%);
+    background:linear-gradient(180deg, var(--panel), var(--bg-2));
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.02);
+    padding:38px clamp(20px,4vw,52px) 30px;
+  }
+  .plate::before{
+    content:"";
+    position:absolute; inset:8px;
+    border:1px solid rgba(236,230,214,.06);
+    border-radius:3px;
+    pointer-events:none;
+  }
+  .rivet{ position:absolute; width:7px; height:7px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #4a4d47, var(--rivet) 60%, #0d0e0c 100%);
+    box-shadow:0 1px 0 rgba(255,255,255,.05), 0 1px 2px rgba(0,0,0,.6);
+  }
+  .rivet.tl{ top:14px; left:14px; } .rivet.tr{ top:14px; right:14px; }
+  .rivet.bl{ bottom:14px; left:14px; } .rivet.br{ bottom:14px; right:14px; }
+
+  header{ text-align:center; margin-bottom:28px; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.28em;
+    color:var(--blood); text-transform:uppercase;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:600;
+    font-size:clamp(26px,4vw,38px);
+    letter-spacing:.14em; text-transform:uppercase;
+    margin:6px 0 4px; text-wrap:balance;
+    color:var(--ink);
+    text-shadow:0 1px 0 rgba(0,0,0,.6);
+  }
+  .sub{ font-family:var(--font-mono); font-size:12px; letter-spacing:.12em; color:var(--ink-faint); text-transform:uppercase; }
+
+  .layout{ display:grid; grid-template-columns:1fr; gap:30px; align-items:start; }
+  @media (min-width:760px){ .layout{ grid-template-columns:1.15fr 1fr; } }
+
+  .dial-wrap{ display:flex; flex-direction:column; align-items:center; gap:18px; }
+  .dial-frame{ position:relative; }
+  canvas{ display:block; touch-action:manipulation; cursor:pointer; }
+
+  .callout{
+    min-height:34px; display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-size:22px; letter-spacing:.06em;
+    text-transform:uppercase; transition:opacity .15s, transform .15s;
+  }
+  .callout.great{ color:var(--gold); }
+  .callout.good{ color:var(--good); }
+  .callout.miss{ color:var(--blood); }
+  .callout.idle{ color:var(--ink-faint); font-family:var(--font-mono); font-size:12px; letter-spacing:.2em; }
+
+  .hit-btn{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+    background:var(--panel-2); color:var(--ink-dim); border:1px solid var(--line);
+    border-radius:3px; padding:10px 22px; cursor:pointer;
+  }
+  .hit-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+  .hit-btn:active{ transform:translateY(1px); }
+  .hit-btn:focus-visible, button:focus-visible, select:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+
+  .panel{ display:flex; flex-direction:column; gap:20px; }
+  .section-title{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.22em; text-transform:uppercase;
+    color:var(--ink-faint); border-bottom:1px solid var(--line); padding-bottom:8px;
+    display:flex; justify-content:space-between;
+  }
+
+  .segmented{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+  .segmented.three{ grid-template-columns:repeat(3,1fr); }
+  .segmented.four{ grid-template-columns:repeat(4,1fr); }
+  .seg-btn{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    background:var(--panel-2); border:1px solid var(--line); color:var(--ink-dim);
+    padding:9px 6px; border-radius:3px; cursor:pointer; text-align:center;
+  }
+  .seg-btn.active{ background:linear-gradient(180deg,#2a1416,#1a0d0e); border-color:var(--blood-dim); color:var(--gold); box-shadow:inset 0 0 0 1px rgba(215,168,60,.15); }
+  .seg-btn:hover:not(.active){ color:var(--ink); }
+
+  .stats{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .stat{ background:var(--panel-2); border:1px solid var(--line); border-radius:3px; padding:10px 12px; }
+  .stat .k{ font-family:var(--font-mono); font-size:10px; letter-spacing:.14em; color:var(--ink-faint); text-transform:uppercase; }
+  .stat .v{ font-family:var(--font-mono); font-size:20px; font-variant-numeric:tabular-nums; color:var(--ink); margin-top:2px; }
+  .stat .v.gold{ color:var(--gold); }
+  .stat .v.blood{ color:var(--blood); }
+
+  .progress-row{ display:flex; flex-direction:column; gap:6px; }
+  .progress-track{ height:10px; border-radius:2px; background:var(--panel-2); border:1px solid var(--line); overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg,var(--blood-dim),var(--gold)); width:0%; transition:width .35s ease; }
+  .progress-label{ display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:10px; letter-spacing:.1em; color:var(--ink-faint); text-transform:uppercase; }
+
+  .controls-row{ display:flex; gap:10px; }
+  .primary-btn{
+    flex:1; font-family:var(--font-mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+    background:linear-gradient(180deg,#2a1416,#1a0d0e); color:var(--gold);
+    border:1px solid var(--blood-dim); border-radius:3px; padding:12px; cursor:pointer;
+  }
+  .primary-btn:hover{ filter:brightness(1.15); }
+  .ghost-btn{
+    font-family:var(--font-mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase;
+    background:transparent; color:var(--ink-faint); border:1px solid var(--line); border-radius:3px; padding:12px 14px; cursor:pointer;
+  }
+  .ghost-btn:hover{ color:var(--ink); border-color:var(--ink-faint); }
+
+  footer{ margin-top:26px; text-align:center; font-family:var(--font-mono); font-size:10.5px; letter-spacing:.06em; color:var(--ink-faint); }
+
+  .flash{ position:fixed; inset:0; pointer-events:none; opacity:0; background:radial-gradient(circle at 50% 45%, rgba(156,36,48,.35), transparent 60%); transition:opacity .08s; z-index:5; }
+  .flash.on{ opacity:1; transition:opacity .02s; }
+  .shake{ animation:shake .35s ease; }
+  @keyframes shake{ 0%,100%{ transform:translate(0,0); } 20%{ transform:translate(-6px,2px);} 40%{ transform:translate(5px,-2px);} 60%{ transform:translate(-4px,1px);} 80%{ transform:translate(3px,-1px);} }
+</style>
+
+<div class="stage" id="stage">
+  <div class="fog"></div>
+  <div class="plate" id="plate">
+    <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+    <header>
+      <div class="eyebrow">Offline Practice Rig</div>
+      <h1>Generator Repair</h1>
+      <div class="sub">Skill&#8209;Check Trainer</div>
+    </header>
+
+    <div class="layout">
+      <div class="dial-wrap">
+        <div class="dial-frame">
+          <canvas id="dial" width="360" height="360" style="width:280px;height:280px;"></canvas>
+        </div>
+        <div class="callout idle" id="callout">Press Start, then Space (or tap) on the light zone</div>
+        <button class="hit-btn" id="hitBtn">Hit &nbsp;·&nbsp; Space</button>
+      </div>
+
+      <div class="panel">
+        <div>
+          <div class="section-title"><span>Difficulty</span><span id="diffReadout">Normal</span></div>
+          <div class="segmented four" id="diffGroup">
+            <button class="seg-btn" data-diff="easy">Easy</button>
+            <button class="seg-btn active" data-diff="normal">Normal</button>
+            <button class="seg-btn" data-diff="hard">Hard</button>
+            <button class="seg-btn" data-diff="nightmare">Nightmare</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title"><span>Mode</span></div>
+          <div class="segmented" id="modeGroup">
+            <button class="seg-btn active" data-mode="drill">Drill · Back&#8209;to&#8209;back</button>
+            <button class="seg-btn" data-mode="repair">Repair · Full Generator</button>
+          </div>
+        </div>
+
+        <div class="progress-row" id="progressRow" style="display:none;">
+          <div class="progress-label"><span>Generator progress</span><span id="progressPct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <div id="followRow" style="display:none;">
+          <div class="section-title"><span>Follow&#8209;up speed</span><span id="followReadout">Fast</span></div>
+          <div class="segmented three" id="followGroup">
+            <button class="seg-btn" data-follow="1">Normal</button>
+            <button class="seg-btn active" data-follow="0.45">Fast</button>
+            <button class="seg-btn" data-follow="0.15">Instant</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title"><span>Session</span><span id="accReadout">— acc.</span></div>
+          <div class="stats">
+            <div class="stat"><div class="k">Great</div><div class="v gold" id="statGreat">0</div></div>
+            <div class="stat"><div class="k">Good</div><div class="v" id="statGood">0</div></div>
+            <div class="stat"><div class="k">Miss</div><div class="v blood" id="statMiss">0</div></div>
+            <div class="stat"><div class="k">Streak</div><div class="v" id="statStreak">0</div></div>
+            <div class="stat"><div class="k">Best Streak</div><div class="v" id="statBest">0</div></div>
+            <div class="stat"><div class="k">Attempts</div><div class="v" id="statAttempts">0</div></div>
+          </div>
+        </div>
+
+        <div class="controls-row">
+          <button class="primary-btn" id="startBtn">Start</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>Simulated locally in your browser · reads no game state, sends no input anywhere</footer>
+  </div>
+  <div class="flash" id="flash"></div>
+</div>
+
+<script src="rubyfarm_bridge.js"></script>
+<script>
+(function(){
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const canvas = document.getElementById('dial');
+  const ctx = canvas.getContext('2d');
+  const SIZE = 360;
+  canvas.width = SIZE * dpr; canvas.height = SIZE * dpr;
+  ctx.scale(dpr, dpr);
+  const cx = SIZE/2, cy = SIZE/2, R = 148;
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const DIFFS = {
+    easy:      { speed: 95,  good: 46, great: 20, trig:[1600,2600], missPenalty: 4, reverseChance: 0 },
+    normal:    { speed: 155, good: 34, great: 14, trig:[1100,2000], missPenalty: 5, reverseChance: 0 },
+    hard:      { speed: 235, good: 24, great: 9,  trig:[750,1450],  missPenalty: 6, reverseChance: .12 },
+    nightmare: { speed: 320, good: 16, great: 6,  trig:[500,1050],  missPenalty: 9, reverseChance: .3 }
+  };
+
+  // Ticket stakes (mirrors serve.py GENREP_DIFFS — display text only, server enforces).
+  const GENREP_FEE  = { easy: 1, normal: 1, hard: 1, nightmare: 1 };  // generator tickets to open one run
+  const GENREP_MISS = { easy: 3, normal: 3, hard: 5, nightmare: 10 }; // misses that lose the run
+
+  const state = {
+    diff: 'normal',
+    mode: 'drill',
+    running: false,
+    active: false,
+    angle: 0,
+    dir: 1,
+    zoneStart: 0, zoneEnd: 0, greatStart: 0, greatEnd: 0,
+    progress: 0,
+    followMult: 0.45,
+    runMiss: 0,
+    greatsAtStart: 0,
+    paidRun: false,
+    stats: { great:0, good:0, miss:0, streak:0, best:0, attempts:0 },
+    lastTs: 0,
+    nextTriggerAt: 0
+  };
+
+  const el = id => document.getElementById(id);
+  const callout = el('callout');
+  const hitBtn = el('hitBtn');
+  const startBtn = el('startBtn');
+  const flash = el('flash');
+  const plate = el('plate');
+  const progressRow = el('progressRow');
+  const progressFill = el('progressFill');
+  const progressPct = el('progressPct');
+  const diffReadout = el('diffReadout');
+  const followRow = el('followRow');
+  const followReadout = el('followReadout');
+
+  function deg2rad(d){ return (d - 90) * Math.PI / 180; }
+
+  function draw(){
+    ctx.clearRect(0,0,SIZE,SIZE);
+
+    // outer housing
+    let g = ctx.createRadialGradient(cx,cy,R*0.6,cx,cy,R*1.15);
+    g.addColorStop(0,'#1c1e1b'); g.addColorStop(1,'#0a0b0a');
+    ctx.beginPath(); ctx.arc(cx,cy,R+18,0,Math.PI*2); ctx.fillStyle=g; ctx.fill();
+
+    // rim rivets
+    for(let i=0;i<16;i++){
+      const a = deg2rad(i*22.5);
+      const rx = cx + Math.cos(a)*(R+18);
+      const ry = cy + Math.sin(a)*(R+18);
+      ctx.beginPath(); ctx.arc(rx,ry,2.4,0,Math.PI*2);
+      ctx.fillStyle = '#3a3c37'; ctx.fill();
+    }
+
+    // base ring (danger track)
+    ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2);
+    ctx.lineWidth = 14; ctx.strokeStyle = '#3a1418'; ctx.stroke();
+
+    // tick marks
+    for(let d=0; d<360; d+=10){
+      const a = deg2rad(d);
+      const inner = R-9, outer = R+9;
+      ctx.beginPath();
+      ctx.moveTo(cx+Math.cos(a)*inner, cy+Math.sin(a)*inner);
+      ctx.lineTo(cx+Math.cos(a)*outer, cy+Math.sin(a)*outer);
+      ctx.strokeStyle = 'rgba(236,230,214,.10)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    // good zone
+    if(state.active || state.progress>0 || state.running){
+      ctx.beginPath();
+      ctx.arc(cx,cy,R, deg2rad(state.zoneStart), deg2rad(state.zoneEnd));
+      ctx.lineWidth = 14; ctx.strokeStyle = '#e9e4d2'; ctx.stroke();
+
+      // great sub-zone
+      ctx.beginPath();
+      ctx.arc(cx,cy,R, deg2rad(state.greatStart), deg2rad(state.greatEnd));
+      ctx.lineWidth = 14; ctx.strokeStyle = '#d7a83c'; ctx.stroke();
+    }
+
+    // hub
+    let hub = ctx.createRadialGradient(cx-8,cy-10,4,cx,cy,26);
+    hub.addColorStop(0,'#4a4d47'); hub.addColorStop(1,'#111210');
+    ctx.beginPath(); ctx.arc(cx,cy,22,0,Math.PI*2); ctx.fillStyle=hub; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx,cy,22,0,Math.PI*2); ctx.lineWidth=1; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.stroke();
+
+    // needle
+    const a = deg2rad(state.angle);
+    const nx = cx + Math.cos(a)*(R-2), ny = cy + Math.sin(a)*(R-2);
+    ctx.beginPath();
+    ctx.moveTo(cx,cy); ctx.lineTo(nx,ny);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = state.active ? '#c94a3a' : 'rgba(236,230,214,.25)';
+    ctx.shadowColor = state.active ? 'rgba(201,74,58,.7)' : 'transparent';
+    ctx.shadowBlur = state.active ? 8 : 0;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
+
+  function setZone(){
+    const d = DIFFS[state.diff];
+    // bias toward the far side of the sweep, away from the needle's start at 0deg,
+    // while staying clear of the 360->0 wrap seam
+    const minMid = 100;
+    const maxMid = 360 - d.good/2 - 6;
+    const mid = minMid + Math.random() * (maxMid - minMid);
+    state.zoneStart = mid - d.good/2;
+    state.zoneEnd = mid + d.good/2;
+    state.greatStart = mid - d.great/2;
+    state.greatEnd = mid + d.great/2;
+  }
+
+  function startRound(){
+    const d = DIFFS[state.diff];
+    setZone();
+    state.angle = 0;
+    state.dir = Math.random() < d.reverseChance ? -1 : 1;
+    state.active = true;
+    setCallout('idle', state.mode==='repair' ? 'Skill check!' : 'Go');
+  }
+
+  function setCallout(kind, text){
+    callout.className = 'callout ' + kind;
+    callout.textContent = text;
+  }
+
+  function updateStatsUI(){
+    const s = state.stats;
+    el('statGreat').textContent = s.great;
+    el('statGood').textContent = s.good;
+    el('statMiss').textContent = s.miss;
+    el('statStreak').textContent = s.streak;
+    el('statBest').textContent = s.best;
+    el('statAttempts').textContent = s.attempts;
+    const acc = s.attempts ? Math.round(((s.great+s.good)/s.attempts)*100) : 0;
+    el('accReadout').textContent = s.attempts ? acc + '% acc.' : '— acc.';
+  }
+
+  function doFlash(){
+    flash.classList.add('on');
+    setTimeout(()=>flash.classList.remove('on'), reduceMotion ? 40 : 90);
+    if(!reduceMotion){ plate.classList.remove('shake'); void plate.offsetWidth; plate.classList.add('shake'); }
+  }
+
+  function resolveHit(){
+    if(!state.active) return;
+    state.active = false;
+    const a = state.angle;
+    const s = state.stats;
+    s.attempts++;
+    let kind;
+    if(a >= state.greatStart && a <= state.greatEnd){
+      kind='great'; s.great++; s.streak++; state.progress += 7;
+      setCallout('great','Great!');
+    } else if(a >= state.zoneStart && a <= state.zoneEnd){
+      kind='good'; s.good++; s.streak++; state.progress += 4;
+      setCallout('good','Good');
+    } else {
+      kind='miss'; s.miss++; state.runMiss++; s.streak=0; doFlash();
+      const d = DIFFS[state.diff];
+      state.progress -= (state.diff==='nightmare' ? d.missPenalty*1.6 : d.missPenalty);
+      if(state.mode==='repair' && (state.runMiss >= GENREP_MISS[state.diff] || state.progress <= 0)){
+        state.running = false;
+        state.active = false;
+        toggleRunUI(false);
+        setCallout('miss', state.progress<=0 ? 'Bị loại — hết progress' : ('Thua — ' + state.runMiss + ' misses'));
+        if(window.rfRefresh) window.rfRefresh();
+        return;
+      }
+      setCallout('miss','Missed');
+    }
+    if(s.streak > s.best) s.best = s.streak;
+    state.progress = Math.max(0, Math.min(100, state.progress));
+    updateStatsUI();
+    updateProgressUI();
+
+    if(state.mode==='repair'){
+      if(state.progress >= 100){
+        setCallout('great','Generator repaired!');
+        state.running = false;
+        state.active = false;
+        toggleRunUI(false);
+        if(state.paidRun && window.rfApi){
+          const runGreat = Math.max(0, s.great - state.greatsAtStart);
+          window.rfApi('/ELDORADO_WEB/wallet/genrep_claim.php', {DIFF: state.diff, GREAT: runGreat})
+            .then(r=>{
+              if(r && r.STATE==='SUCCESS'){
+                setCallout('great','+'+r.reward+' ruby 🎉');
+                if(window.rfRefresh) window.rfRefresh();
+              } else {
+                setCallout('miss', (r && r.msg==='no session') ? 'Hết phiên — không nhận được thưởng' : 'Lỗi server khi nhận thưởng');
+              }
+            });
+        }
+        return;
+      }
+      scheduleNextTrigger();
+    } else {
+      setTimeout(()=>{ if(state.running) startRound(); }, 480);
+    }
+  }
+
+  function scheduleNextTrigger(){
+    const d = DIFFS[state.diff];
+    const wait = (d.trig[0] + Math.random()*(d.trig[1]-d.trig[0])) * state.followMult;
+    setCallout('idle', 'Holding the generator…');
+    state.nextTriggerAt = performance.now() + wait;
+  }
+
+  function updateProgressUI(){
+    progressFill.style.width = state.progress + '%';
+    progressPct.textContent = Math.round(state.progress) + '%';
+  }
+
+  function loop(ts){
+    if(!state.lastTs) state.lastTs = ts;
+    const dt = (ts - state.lastTs) / 1000;
+    state.lastTs = ts;
+
+    if(state.running && state.active){
+      const d = DIFFS[state.diff];
+      state.angle += d.speed * dt * state.dir;
+      if(state.angle >= 360){ state.angle -= 360; resolveHit(); } // untouched full lap -> forced miss
+      else if(state.angle < 0){ state.angle += 360; }
+    }
+
+    if(state.running && state.mode==='repair' && !state.active && state.nextTriggerAt && ts >= state.nextTriggerAt){
+      state.nextTriggerAt = 0;
+      startRound();
+    }
+
+    draw();
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+
+  function toggleRunUI(running){
+    if(state.mode==='repair' && !running){
+      startBtn.textContent = 'Start · ' + (GENREP_FEE[state.diff] || '?') + ' vé ⚙️';
+    } else {
+      startBtn.textContent = running ? 'Stop' : 'Start';
+    }
+  }
+
+  function begin(){
+    if(state.mode==='repair'){
+      setCallout('idle','Mở lượt chơi — trả ' + (GENREP_FEE[state.diff] || '?') + ' vé generator…');
+      if(window.rfApi){
+        window.rfApi('/ELDORADO_WEB/wallet/genrep_start.php', {DIFF: state.diff}).then(r=>{
+          if(r && r.STATE==='SUCCESS'){
+            state.paidRun = true;
+            state.runMiss = 0;
+            state.greatsAtStart = state.stats.great;
+            state.progress = 50; updateProgressUI();
+            state.running = true;
+            toggleRunUI(true);
+            scheduleNextTrigger();
+            setCallout('idle', 'Đã trừ ' + r.ticket + ' vé — còn ' + r.tickets + ' vé generator');
+            if(window.rfRefresh) window.rfRefresh();
+          } else if(r && r.STATE==='NETERR'){
+            // Server unreachable (game opened by itself, no offline server): free practice.
+            state.paidRun = false;
+            state.runMiss = 0;
+            state.greatsAtStart = state.stats.great;
+            state.progress = 50; updateProgressUI();
+            state.running = true;
+            toggleRunUI(true);
+            scheduleNextTrigger();
+          } else {
+            const m = (r && r.msg==='need ticket') ? 'Không còn vé generator (cần ' + ((r && r.ticket) || '1') + ' vé) — mua trong RubyFarm' :
+                      'Không mở được lượt';
+            setCallout('miss', m);
+            if(window.rfRefresh) window.rfRefresh();
+          }
+        });
+      }
+      return;
+    }
+    state.paidRun = false;
+    state.runMiss = 0;
+    state.greatsAtStart = state.stats.great;
+    state.running = true;
+    toggleRunUI(true);
+    startRound();
+  }
+  function stop(){
+    state.running = false;
+    state.active = false;
+    toggleRunUI(false);
+    setCallout('idle','Stopped');
+  }
+
+  startBtn.addEventListener('click', ()=>{ state.running ? stop() : begin(); });
+  hitBtn.addEventListener('click', resolveHit);
+  window.addEventListener('keydown', e=>{
+    if(e.code==='Space'){ e.preventDefault(); if(state.running) resolveHit(); }
+  });
+  canvas.addEventListener('click', ()=>{ if(state.running) resolveHit(); });
+
+  document.getElementById('diffGroup').addEventListener('click', e=>{
+    const btn = e.target.closest('.seg-btn'); if(!btn) return;
+    if(state.running && state.diff !== btn.dataset.diff){
+      setCallout('miss','Dừng lượt đang chơi trước khi đổi mức');
+      return;
+    }
+    document.querySelectorAll('#diffGroup .seg-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.diff = btn.dataset.diff;
+    diffReadout.textContent = btn.textContent;
+    if(!state.running) toggleRunUI(false);
+  });
+  document.getElementById('modeGroup').addEventListener('click', e=>{
+    const btn = e.target.closest('.seg-btn'); if(!btn) return;
+    if(state.running){
+      setCallout('miss','Dừng lượt đang chơi trước khi đổi chế độ');
+      return;
+    }
+    document.querySelectorAll('#modeGroup .seg-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.mode = btn.dataset.mode;
+    progressRow.style.display = state.mode==='repair' ? 'flex' : 'none';
+    followRow.style.display = state.mode==='repair' ? 'block' : 'none';
+    state.stats = { great:0, good:0, miss:0, streak:0, best:0, attempts:0 };
+    state.runMiss = 0;
+    state.greatsAtStart = 0;
+    updateStatsUI();
+    stop();
+    state.progress = 0; updateProgressUI();
+    setCallout('idle', state.mode==='repair' ? 'Press Start to begin repairing' : 'Press Start, then Space (or tap) on the light zone');
+  });
+  document.getElementById('followGroup').addEventListener('click', e=>{
+    const btn = e.target.closest('.seg-btn'); if(!btn) return;
+    document.querySelectorAll('#followGroup .seg-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    state.followMult = parseFloat(btn.dataset.follow);
+    followReadout.textContent = btn.textContent;
+  });
+
+  updateStatsUI();
+  updateProgressUI();
+  draw();
+})();
+</script>

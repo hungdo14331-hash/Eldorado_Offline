@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','Arial',sans-serif;background:#f0f4f8;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.container{background:#fff;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.1);padding:30px;max-width:540px;width:100%}
+h1{text-align:center;color:#1a1a2e;margin-bottom:20px;font-size:28px;font-weight:700}
+.timer{text-align:center;font-size:18px;font-weight:600;color:#495057;margin-bottom:12px;font-variant-numeric:tabular-nums}
+.timer.low{color:#dc3545;animation:pulse 1s ease infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+.difficulty-select{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
+.diff-btn{padding:6px 16px;border:2px solid #dee2e6;border-radius:20px;background:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;color:#495057}
+.diff-btn.active{border-color:#6f42c1;background:#6f42c1;color:#fff}
+.diff-btn:hover{border-color:#6f42c1}
+.board{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;background:#adb5bd;border:2px solid #212529;border-radius:4px;overflow:hidden;user-select:none}
+.cell{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;background:#fff;cursor:pointer;transition:background .1s;color:#1a1a2e;font-family:Arial,Helvetica,sans-serif}
+/* 3x3 box borders */
+.cell.r2,.cell.r5{border-bottom:2px solid #212529}
+.cell.c2,.cell.c5{border-right:2px solid #212529}
+.cell.given{color:#0d6efd;font-weight:700}
+.cell.selected{background:#bbdefb}
+.cell.same-num{background:#c8e6c9}
+.cell.conflict{background:#ffcdd2!important;color:#d32f2f!important}
+.cell:hover{background:#e8eaf6}
+.cell.highlight{background:#e3f2fd}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.cell.solved{color:#2e7d32!important;animation:pop .3s ease}
+.cell.manual-input{color:#e65100}
+.num-pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;margin-top:16px}
+.num-btn{padding:8px;border:1px solid #dee2e6;border-radius:6px;background:#fff;font-size:18px;font-weight:600;cursor:pointer;transition:all .15s;color:#1a1a2e}
+.num-btn:hover{background:#e3f2fd;border-color:#0d6efd}
+.num-btn:active{background:#bbdefb}
+.num-btn.clear{grid-column:span 9;background:#f8f9fa;color:#dc3545;border-color:#f5c6cb}
+.num-btn.clear:hover{background:#fce4ec}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;justify-content:center}
+.btn{padding:10px 20px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;color:#fff}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.btn:active{transform:translateY(0)}
+.btn-solve{background:#0d6efd}
+.btn-check{background:#198754}
+.btn-generate{background:#6f42c1}
+.btn-clear{background:#dc3545}
+.btn-undo{background:#fd7e14}
+.btn-load{background:#6c757d}
+.btn-matrix{background:#e67e22}
+.btn-save{background:#0dcaf0}
+.btn-open{background:#adb5bd;color:#1a1a2e}
+.btn-hint{background:#20c997}
+.status{text-align:center;margin-top:16px;font-size:15px;color:#6c757d;min-height:24px}
+.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999}
+.toast.show{opacity:1}
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;justify-content:center;align-items:center;z-index:1000}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:30px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
+.modal h2{margin-bottom:12px;font-size:20px;color:#1a1a2e}
+.modal textarea{width:100%;height:180px;font-family:monospace;font-size:14px;padding:12px;border:1px solid #dee2e6;border-radius:8px;resize:vertical;tab-size:1}
+.modal textarea:focus{outline:2px solid #6f42c1;border-color:transparent}
+.modal-actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+.modal-actions .btn-modal-cancel{background:#6c757d}
+.modal-actions .btn-modal-ok{background:#0d6efd}
+.load-item{display:flex;justify-content:space-between;align-items:center;padding:12px 8px;border-bottom:1px solid #eee;font-size:14px}
+.load-item:last-child{border-bottom:none}
+.load-name{font-weight:600;color:#1a1a2e}
+.load-btn,.load-del{padding:4px 12px;border:none;border-radius:4px;font-size:12px;font-weight:600;cursor:pointer;color:#fff;margin-left:6px}
+.load-btn{background:#0d6efd}
+.load-del{background:#dc3545}
+.load-list{max-height:300px;overflow-y:auto;margin-bottom:12px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Sudoku</h1>
+<div class="timer" id="timer">00:00</div>
+<div class="difficulty-select">
+<button class="diff-btn active" data-diff="easy">Dễ</button>
+<button class="diff-btn" data-diff="medium">Trung bình</button>
+<button class="diff-btn" data-diff="hard">Khó</button>
+<button class="diff-btn" data-diff="expert">Chuyên gia</button>
+</div>
+<div class="board" id="board"></div>
+<div class="num-pad" id="numPad">
+<button class="num-btn" data-num="1">1</button>
+<button class="num-btn" data-num="2">2</button>
+<button class="num-btn" data-num="3">3</button>
+<button class="num-btn" data-num="4">4</button>
+<button class="num-btn" data-num="5">5</button>
+<button class="num-btn" data-num="6">6</button>
+<button class="num-btn" data-num="7">7</button>
+<button class="num-btn" data-num="8">8</button>
+<button class="num-btn" data-num="9">9</button>
+<button class="num-btn clear" data-num="0">Xóa</button>
+</div>
+<div class="controls">
+<button class="btn btn-generate" id="generateBtn">Tạo mới</button>
+    <button class="btn btn-load" id="loadBtn">Nhập</button>
+    <button class="btn btn-check" id="checkBtn">Kiểm tra</button>
+    <button class="btn btn-undo" id="undoBtn">Hoàn tác</button>
+    <button class="btn btn-clear" id="clearBtn">Xóa hết</button>
+</div>
+<div class="status" id="status">Nhấn "Tạo mới" để tạo câu đố hoặc "Tạo ma trận" để tự nhập</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+<div class="modal">
+<h2>Nhập ma trận Sudoku</h2>
+<p style="color:#6c757d;font-size:13px;margin-bottom:12px">Nhập 9 dòng, mỗi dòng 9 số (0 hoặc cách trống cho ô trống).</p>
+<textarea id="inputArea" placeholder="530070000
+600195000
+098000060
+800060003
+400803001
+700020006
+060000280
+000419005
+000080079"></textarea>
+<div class="modal-actions">
+<button class="btn btn-modal-cancel" id="modalCancel">Hủy</button>
+<button class="btn btn-modal-ok" id="modalOk">OK</button>
+</div>
+</div>
+</div>
+
+<div class="modal-overlay" id="loadOverlay">
+<div class="modal">
+<h2>Mở ma trận đã lưu</h2>
+<div class="load-list" id="loadList"></div>
+<div class="modal-actions">
+<button class="btn btn-modal-cancel" id="loadCancel">Hủy</button>
+</div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="rubyfarm_bridge.js"></script>
+<script>
+// ---- State ----
+let board = Array(9).fill().map(()=>Array(9).fill(0));
+let initialBoard = Array(9).fill().map(()=>Array(9).fill(0));
+let solution = Array(9).fill().map(()=>Array(9).fill(0));
+let selectedRow = -1, selectedCol = -1;
+let history = [];
+let timerInterval = null;
+let seconds = 0;
+let isPlaying = false;
+let difficulty = 'easy';
+let generating = false;
+let paidRun = false;
+let timeLimit = 0;
+
+const difficultyLevels = {easy:36, medium:30, hard:25, expert:22};
+// Mirrors serve.py SUDOKU_DIFFS time limits (used for countdown display).
+const SUDOKU_TIMES = {easy:600, medium:900, hard:1200, expert:1500};
+
+// ---- DOM refs ----
+const $ = id => document.getElementById(id);
+const boardEl = $('board');
+const statusEl = $('status');
+const timerEl = $('timer');
+const toastEl = $('toast');
+const modalOverlay = $('modalOverlay');
+const inputArea = $('inputArea');
+
+// ---- Toast ----
+let toastTimer = null;
+function showToast(msg) {
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+}
+
+// ---- Board rendering ----
+function initBoard() {
+  boardEl.innerHTML = '';
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.row = r;
+      cell.dataset.col = c;
+      if (r === 2) cell.classList.add('r2');
+      if (r === 5) cell.classList.add('r5');
+      if (c === 2) cell.classList.add('c2');
+      if (c === 5) cell.classList.add('c5');
+      cell.addEventListener('click', () => selectCell(r, c));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+function renderBoard() {
+  const cells = boardEl.children;
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const cell = cells[r * 9 + c];
+      const val = board[r][c];
+      cell.textContent = val !== 0 ? val : '';
+      cell.classList.remove('given', 'solved', 'same-num', 'conflict', 'selected', 'manual-input');
+      if (initialBoard[r][c] !== 0) {
+        cell.classList.add('given');
+      }
+    }
+  }
+  highlightSelected();
+  highlightSameNumber();
+  highlightConflicts();
+}
+
+function selectCell(r, c) {
+  selectedRow = r; selectedCol = c;
+  highlightSelected();
+  highlightSameNumber();
+}
+
+function highlightSelected() {
+  const cells = boardEl.children;
+  for (let i = 0; i < 81; i++) cells[i].classList.remove('selected');
+  if (selectedRow < 0) return;
+  cells[selectedRow * 9 + selectedCol].classList.add('selected');
+}
+
+function highlightSameNumber() {
+  const cells = boardEl.children;
+  for (let i = 0; i < 81; i++) cells[i].classList.remove('same-num');
+  if (selectedRow < 0) return;
+  const val = board[selectedRow][selectedCol];
+  if (val === 0) return;
+  for (let r = 0; r < 9; r++)
+    for (let c = 0; c < 9; c++)
+      if (board[r][c] === val) cells[r * 9 + c].classList.add('same-num');
+}
+
+function highlightConflicts() {
+  const cells = boardEl.children;
+  const conflicts = getConflicts();
+  for (let i = 0; i < 81; i++) cells[i].classList.remove('conflict');
+  for (const [r, c] of conflicts) cells[r * 9 + c].classList.add('conflict');
+}
+
+function getConflicts() {
+  const set = new Set();
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const v = board[r][c];
+      if (v === 0) continue;
+      for (let cc = c + 1; cc < 9; cc++) if (board[r][cc] === v) { set.add(r+','+c); set.add(r+','+cc); }
+      for (let rr = r + 1; rr < 9; rr++) if (board[rr][c] === v) { set.add(r+','+c); set.add(rr+','+c); }
+      const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+      for (let rr = br; rr < br+3; rr++)
+        for (let cc = bc; cc < bc+3; cc++) {
+          if (rr === r && cc === c) continue;
+          if (board[rr][cc] === v) { set.add(r+','+c); set.add(rr+','+cc); }
+        }
+    }
+  }
+  return [...set].map(x => x.split(',').map(Number));
+}
+
+// ---- Input ----
+function placeNumber(num) {
+  if (generating) return;
+  if (selectedRow < 0 || selectedCol < 0) { showToast('Vui lòng chọn một ô'); return; }
+  const r = selectedRow, c = selectedCol;
+  if (initialBoard[r][c] !== 0) { showToast('Không thể thay đổi ô đã cho'); return; }
+  history.push({ r, c, oldVal: board[r][c] });
+  board[r][c] = num;
+  renderBoard();
+}
+
+function undo() {
+  if (generating) return;
+  if (history.length === 0) { showToast('Không có gì để hoàn tác'); return; }
+  const act = history.pop();
+  if (initialBoard[act.r][act.c] !== 0) return;
+  board[act.r][act.c] = act.oldVal;
+  selectedRow = act.r; selectedCol = act.c;
+  renderBoard();
+}
+
+function clearUserInput() {
+  if (generating) return;
+  const hasData = board.some(r => r.some(v => v !== 0));
+  if (!hasData) { showToast('Không có dữ liệu để xóa'); return; }
+  if (!confirm('Xóa toàn bộ các ô đã nhập?')) return;
+  history = [];
+  board = initialBoard.map(r => [...r]);
+  renderBoard();
+  showToast('Đã xóa các ô đã nhập');
+}
+
+// ---- Solver ----
+function isValid(board, r, c, num) {
+  for (let i = 0; i < 9; i++) if (board[r][i] === num) return false;
+  for (let i = 0; i < 9; i++) if (board[i][c] === num) return false;
+  const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+  for (let i = br; i < br+3; i++)
+    for (let j = bc; j < bc+3; j++)
+      if (board[i][j] === num) return false;
+  return true;
+}
+
+// Solve in-place, returns true if solved
+function solve(board) {
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (board[r][c] === 0) {
+        for (let num = 1; num <= 9; num++) {
+          if (isValid(board, r, c, num)) {
+            board[r][c] = num;
+            if (solve(board)) return true;
+            board[r][c] = 0;
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function solveFast(board, maxNodes) {
+  let nodes = 0;
+  function dfs(b) {
+    nodes++;
+    if (nodes > maxNodes) return false;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (b[r][c] === 0) {
+          for (let num = 1; num <= 9; num++) {
+            if (isValid(b, r, c, num)) {
+              b[r][c] = num;
+              if (dfs(b)) return true;
+              b[r][c] = 0;
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  return dfs(b);
+}
+
+// Find any solution (different from ref by at least one cell)
+function findSecondSolution(board, ref, maxNodes) {
+  let nodes = 0;
+  let refStr = JSON.stringify(ref);
+  function dfs(b) {
+    nodes++;
+    if (nodes > maxNodes) return false;
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (b[r][c] === 0) {
+          for (let num = 1; num <= 9; num++) {
+            if (isValid(b, r, c, num)) {
+              b[r][c] = num;
+              if (dfs(b)) return true;
+              b[r][c] = 0;
+            }
+          }
+          return false;
+        }
+      }
+    }
+    // Full solution found
+    return JSON.stringify(b) !== refStr;
+  }
+  return dfs(b);
+}
+
+// ---- Generator ----
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function generateFullBoard() {
+  const b = Array(9).fill().map(() => Array(9).fill(0));
+  // Fill with backtracking + random choice
+  function fill(board) {
+    for (let r = 0; r < 9; r++) {
+      for (let c = 0; c < 9; c++) {
+        if (board[r][c] === 0) {
+          const nums = shuffle([1,2,3,4,5,6,7,8,9]);
+          for (const num of nums) {
+            if (isValid(board, r, c, num)) {
+              board[r][c] = num;
+              if (fill(board)) return true;
+              board[r][c] = 0;
+            }
+          }
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+  fill(b);
+  return b;
+}
+
+function generatePuzzle() {
+  if (generating) return;
+  generating = true;
+  statusEl.textContent = 'Đang tạo câu đố...';
+
+  const doGenerate = () => {
+    try {
+      const full = generateFullBoard();
+      solution = full.map(r => [...r]);
+      const puzzle = full.map(r => [...r]);
+
+      const target = difficultyLevels[difficulty] || 30;
+      const toRemove = 81 - target;
+
+      const indices = shuffle([...Array(81).keys()]);
+
+      let removed = 0;
+      for (const idx of indices) {
+        if (removed >= toRemove) break;
+        const r = Math.floor(idx / 9), c = idx % 9;
+        puzzle[r][c] = 0;
+        removed++;
+      }
+
+      board = puzzle.map(r => [...r]);
+      initialBoard = puzzle.map(r => [...r]);
+      history = [];
+      seconds = 0;
+      isPlaying = true;
+      selectedRow = -1;
+      selectedCol = -1;
+      renderBoard();
+      statusEl.textContent = paidRun
+        ? `Câu đố mới (${difficulty.toUpperCase()}) — giải trong ${Math.floor((timeLimit || SUDOKU_TIMES[difficulty]) / 60)} phút`
+        : `Câu đố mới (${difficulty.toUpperCase()}) — điền số vào ô trống`;
+      startTimer();
+      if (paidRun) showToast('Đã trừ 1 vé — còn ' + paidRunTickets + ' vé sudoku');
+      else showToast('Đã tạo câu đố mới! (chế độ thực hành)');
+    } catch(e) {
+      showToast('Lỗi: ' + e.message);
+      statusEl.textContent = 'Có lỗi xảy ra khi tạo câu đố';
+    } finally {
+      generating = false;
+    }
+  };
+
+  const startPaid = () => {
+    if (window.rfApi) {
+      window.rfApi('/ELDORADO_WEB/wallet/sudoku_start.php', {DIFF: difficulty}).then(r => {
+        if (r && r.STATE === 'SUCCESS') {
+          paidRun = true;
+          timeLimit = r.time || SUDOKU_TIMES[difficulty];
+          paidRunTickets = r.tickets;
+          doGenerate();
+        } else if (r && r.STATE === 'NETERR') {
+          paidRun = false;
+          timeLimit = 0;
+          doGenerate();
+        } else {
+          paidRun = false;
+          timeLimit = 0;
+          generating = false;
+          const m = (r && r.msg === 'need ticket')
+            ? 'Không còn vé sudoku (cần ' + ((r && r.ticket) || 1) + ' vé) — mua trong RubyFarm'
+            : 'Không mở được lượt';
+          statusEl.textContent = m;
+          showToast(m);
+          if (window.rfRefresh) window.rfRefresh();
+        }
+      });
+    } else {
+      paidRun = false;
+      timeLimit = 0;
+      doGenerate();
+    }
+  };
+
+  startPaid();
+}
+
+let paidRunTickets = '?';
+
+function createBlankMatrix() {
+  if (generating) return;
+  board = Array(9).fill().map(() => Array(9).fill(0));
+  initialBoard = Array(9).fill().map(() => Array(9).fill(0));
+  solution = Array(9).fill().map(() => Array(9).fill(0));
+  history = [];
+  seconds = 0;
+  isPlaying = true;
+  selectedRow = -1;
+  selectedCol = -1;
+  paidRun = false;
+  timeLimit = 0;
+  stopTimer();
+  renderBoard();
+  updateTimer();
+  statusEl.textContent = 'Đã tạo ma trận trống — nhấn vào ô và nhập số';
+  showToast('Đã tạo ma trận trống');
+}
+
+// ---- Timer ----
+function startTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    seconds++;
+    if (paidRun && timeLimit > 0 && seconds >= timeLimit) {
+      timeoutRun();
+      return;
+    }
+    updateTimer();
+  }, 1000);
+  updateTimer();
+}
+
+function stopTimer() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = null;
+}
+
+function timeoutRun() {
+  stopTimer();
+  isPlaying = false;
+  paidRun = false;
+  timeLimit = 0;
+  statusEl.textContent = 'Hết giờ — bạn đã thua lượt này';
+  showToast('Hết giờ! Vé đã được dùng');
+  updateTimer();
+  if (window.rfRefresh) window.rfRefresh();
+}
+
+function updateTimer() {
+  if (paidRun && timeLimit > 0) {
+    const rem = Math.max(0, timeLimit - seconds);
+    const m = String(Math.floor(rem / 60)).padStart(2, '0');
+    const s = String(rem % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+    timerEl.classList.toggle('low', rem <= 60);
+  } else {
+    timerEl.classList.remove('low');
+    const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+    const s = String(seconds % 60).padStart(2, '0');
+    timerEl.textContent = `${m}:${s}`;
+  }
+}
+
+// ---- Check ----
+function checkSolution() {
+  if (generating) return;
+  if (!isPlaying) { showToast('Không có câu đố nào đang chơi'); return; }
+  const errs = getConflicts();
+  if (errs.length > 0) {
+    highlightConflicts();
+    showToast(`Có xung đột! ${errs.length / 2} vị trí lỗi`);
+    return;
+  }
+  for (let r = 0; r < 9; r++)
+    for (let c = 0; c < 9; c++)
+      if (board[r][c] === 0) { showToast('Chưa điền hết ô!'); return; }
+  stopTimer();
+  isPlaying = false;
+  const wasPaid = paidRun;
+  paidRun = false;
+  timeLimit = 0;
+  statusEl.textContent = 'Chính xác! Bạn đã giải thành công!';
+  if (wasPaid && window.rfApi) {
+    window.rfApi('/ELDORADO_WEB/wallet/sudoku_claim.php', {DIFF: difficulty}).then(r => {
+      if (r && r.STATE === 'SUCCESS') {
+        statusEl.textContent = 'Chính xác! +' + r.reward + ' 💎';
+        showToast('Giải thành công! +' + r.reward + ' 💎');
+        if (window.rfRefresh) window.rfRefresh();
+      } else {
+        showToast('Giải thành công!');
+      }
+    });
+  } else {
+    const DIFF_PRIZE = { easy:10, medium:20, hard:35, expert:50 };
+    statusEl.textContent = 'Chính xác! (thực hành — lượt vé thưởng ' + (DIFF_PRIZE[difficulty] || 0) + ' 💎)';
+    showToast('Giải thành công!');
+  }
+  updateTimer();
+}
+
+// ---- Solve display ----
+function solveDisplay() {
+  if (generating) return;
+  const hasData = board.some(r => r.some(v => v !== 0));
+  if (!hasData) {
+    showToast('Không có dữ liệu để giải');
+    return;
+  }
+  statusEl.textContent = 'Đang giải...';
+  setTimeout(() => {
+    const b = board.map(r => [...r]);
+    if (solve(b)) {
+      board = b;
+      isPlaying = false;
+      stopTimer();
+      renderBoard();
+      statusEl.textContent = 'Đã giải xong!';
+      showToast('Đã giải xong câu đố');
+    } else {
+      showToast('Không tìm thấy lời giải');
+      statusEl.textContent = 'Không tìm thấy lời giải — câu đố có thể bị lỗi';
+    }
+  }, 50);
+}
+
+// ---- Save / Load ----
+function saveMatrix() {
+  if (generating) return;
+  const defaultName = 'Sudoku ' + new Date().toLocaleDateString('vi-VN');
+  const name = prompt('Nhập tên ma trận:', defaultName);
+  if (!name || !name.trim()) return;
+  const key = 'sudoku-save-' + name.trim();
+  const data = { board, initialBoard, solution, seconds, isPlaying, difficulty };
+  localStorage.setItem(key, JSON.stringify(data));
+  const list = JSON.parse(localStorage.getItem('sudoku-save-list') || '[]');
+  if (!list.find(item => item.name === name.trim()))
+    list.push({ name: name.trim(), timestamp: Date.now() });
+  localStorage.setItem('sudoku-save-list', JSON.stringify(list));
+  showToast('Đã lưu "' + name.trim() + '"');
+}
+
+function openLoadModal() {
+  if (generating) return;
+  const list = JSON.parse(localStorage.getItem('sudoku-save-list') || '[]');
+  const container = $('loadList');
+  if (list.length === 0) {
+    container.innerHTML = '<p style="color:#999;text-align:center;padding:20px">Chưa có ma trận nào được lưu</p>';
+  } else {
+    container.innerHTML = list
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .map(item => `<div class="load-item">
+        <span class="load-name">${item.name}</span>
+        <span>
+          <button class="load-btn" data-name="${item.name.replace(/"/g,'&quot;')}">Mở</button>
+          <button class="load-del" data-name="${item.name.replace(/"/g,'&quot;')}">Xóa</button>
+        </span>
+      </div>`)
+      .join('');
+    container.querySelectorAll('.load-btn').forEach(btn =>
+      btn.addEventListener('click', () => loadMatrix(btn.dataset.name)));
+    container.querySelectorAll('.load-del').forEach(btn =>
+      btn.addEventListener('click', () => deleteSave(btn.dataset.name)));
+  }
+  $('loadOverlay').classList.add('show');
+}
+
+function loadMatrix(name) {
+  const key = 'sudoku-save-' + name;
+  const raw = localStorage.getItem(key);
+  if (!raw) { showToast('Không tìm thấy dữ liệu'); return; }
+  try {
+    const data = JSON.parse(raw);
+    board = data.board;
+    initialBoard = data.initialBoard;
+    solution = data.solution || Array(9).fill().map(()=>Array(9).fill(0));
+    seconds = data.seconds || 0;
+    isPlaying = data.isPlaying !== undefined ? data.isPlaying : true;
+    difficulty = data.difficulty || 'easy';
+    paidRun = false;
+    timeLimit = 0;
+    history = [];
+    selectedRow = -1; selectedCol = -1;
+    stopTimer();
+    renderBoard();
+    updateTimer();
+    if (isPlaying) startTimer();
+    statusEl.textContent = 'Đã mở "' + name + '"';
+    $('loadOverlay').classList.remove('show');
+    showToast('Đã mở "' + name + '"');
+  } catch(e) {
+    showToast('Lỗi đọc dữ liệu');
+  }
+}
+
+function deleteSave(name) {
+  const key = 'sudoku-save-' + name;
+  localStorage.removeItem(key);
+  let list = JSON.parse(localStorage.getItem('sudoku-save-list') || '[]');
+  list = list.filter(item => item.name !== name);
+  localStorage.setItem('sudoku-save-list', JSON.stringify(list));
+  openLoadModal();
+  showToast('Đã xóa "' + name + '"');
+}
+
+// ---- Manual input ----
+function parseInput(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  if (lines.length !== 9) return null;
+  const result = Array(9).fill().map(() => Array(9).fill(0));
+  for (let r = 0; r < 9; r++) {
+    const line = lines[r].trim();
+    const chars = line.replace(/\s+/g, '');
+    if (chars.length < 9) return null;
+    for (let c = 0; c < 9; c++) {
+      const ch = chars[c];
+      if (ch >= '1' && ch <= '9') result[r][c] = parseInt(ch);
+      else if (ch === '0' || ch === '.') result[r][c] = 0;
+      else return null;
+    }
+  }
+  return result;
+}
+
+function loadFromInput() {
+  if (generating) return;
+  const text = inputArea.value;
+  const parsed = parseInput(text);
+  if (!parsed) { showToast('Dữ liệu không hợp lệ — cần 9 dòng, mỗi dòng 9 số'); return; }
+  
+  // Validate
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      if (parsed[r][c] !== 0) {
+        const v = parsed[r][c];
+        parsed[r][c] = 0;
+        if (!isValid(parsed, r, c, v)) {
+          showToast(`Xung đột tại (${r+1},${c+1}) với số ${v}`);
+          return;
+        }
+        parsed[r][c] = v;
+      }
+    }
+  }
+  
+  board = parsed.map(r => [...r]);
+  initialBoard = parsed.map(r => [...r]);
+  solution = Array(9).fill().map(() => Array(9).fill(0));
+  history = [];
+  seconds = 0;
+  isPlaying = true;
+  paidRun = false;
+  timeLimit = 0;
+  selectedRow = -1; selectedCol = -1;
+  stopTimer();
+  modalOverlay.classList.remove('show');
+  renderBoard();
+  updateTimer();
+  statusEl.textContent = 'Đã nhập ma trận — hãy giải!';
+  startTimer();
+  showToast('Đã nhập ma trận thành công');
+}
+
+function openModal() {
+  if (generating) return;
+  modalOverlay.classList.add('show');
+  inputArea.focus();
+}
+
+function closeModal() {
+  modalOverlay.classList.remove('show');
+}
+
+// ---- Keyboard ----
+document.addEventListener('keydown', e => {
+  if (modalOverlay.classList.contains('show')) {
+    if (e.key === 'Escape') closeModal();
+    return;
+  }
+  if ($('loadOverlay').classList.contains('show')) {
+    if (e.key === 'Escape') $('loadOverlay').classList.remove('show');
+    return;
+  }
+  
+  if (e.key >= '1' && e.key <= '9') { placeNumber(parseInt(e.key)); return; }
+  if (e.key === 'Backspace' || e.key === 'Delete' || e.key === '0') { e.preventDefault(); placeNumber(0); return; }
+  if ((e.key === 'z' || e.key === 'Z') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); undo(); return; }
+  
+  const dirs = { ArrowUp: [-1,0], ArrowDown: [1,0], ArrowLeft: [0,-1], ArrowRight: [0,1] };
+  if (dirs[e.key]) {
+    e.preventDefault();
+    if (selectedRow < 0) { selectedRow = 0; selectedCol = 0; }
+    else {
+      selectedRow = Math.max(0, Math.min(8, selectedRow + dirs[e.key][0]));
+      selectedCol = Math.max(0, Math.min(8, selectedCol + dirs[e.key][1]));
+    }
+    highlightSelected();
+    highlightSameNumber();
+  }
+});
+
+// ---- Event listeners ----
+document.querySelectorAll('.num-btn').forEach(btn =>
+  btn.addEventListener('click', () => placeNumber(parseInt(btn.dataset.num)))
+);
+
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    difficulty = btn.dataset.diff;
+    generatePuzzle();
+  });
+});
+
+$('generateBtn').addEventListener('click', generatePuzzle);
+$('loadBtn').addEventListener('click', openModal);
+$('checkBtn').addEventListener('click', checkSolution);
+$('undoBtn').addEventListener('click', undo);
+$('clearBtn').addEventListener('click', clearUserInput);
+$('modalCancel').addEventListener('click', closeModal);
+$('modalOk').addEventListener('click', loadFromInput);
+$('loadCancel').addEventListener('click', () => $('loadOverlay').classList.remove('show'));
+
+modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) closeModal(); });
+$('loadOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) $('loadOverlay').classList.remove('show'); });
+
+inputArea.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) { e.preventDefault(); loadFromInput(); }
+});
+
+// ---- Init ----
+initBoard();
+renderBoard();
+statusEl.textContent = 'Nhấn "Tạo mới" để tạo câu đố hoặc "Tạo ma trận" để tự nhập';
+</script>
+</body>
+</html>

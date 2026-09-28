@@ -1,0 +1,30 @@
+﻿# -*- coding: utf-8 -*-
+import io, os, re, glob
+W = os.path.dirname(os.path.abspath(__file__))
+mn = None
+for g in (os.path.join(W,"ELDORADO_WEB","javascript_min","*.js"), os.path.join(W,"ELDORADO_WEB","source_20240722","javascript_min","*.js")):
+    for p in glob.glob(g):
+        if os.path.basename(p).startswith("eldorado_all") and os.path.getsize(p) > 400000:
+            mn = p
+s = io.open(mn, encoding="utf-8", errors="replace").read()
+out = io.open(os.path.join(W,"_evolurl_out.txt"),"w",encoding="utf-8")
+w = out.write
+w("min=%s (%d byte)\n" % (mn,len(s)))
+def scan(pat,label,maxh=8,half=200):
+    w("\n"+"="*66+"\n## %s  pattern=%s\n"%(label,pat))
+    p=re.compile(pat,re.I); n=0
+    for m in p.finditer(s):
+        i=m.start()
+        w("----@%d----\n  %s\n"%(i, s[max(0,i-half):i+half].replace("\n"," ")))
+        n+=1
+        if n>=maxh: break
+    if n==0: w("  (không thấy)\n")
+# URL thật khi bấm evolution: cnm_evolution / evolution / evolve / starup
+scan(r"cnm_evolution\.php|evolution\.php|cnm_evolve\.php|cnm_evol\w*\.php|/evol\w*/|evol\w*_serve\.php|gS_EVOLUTION_REQUEST|EVOLUTION_URL", "(1) URL evolution trong min.js")
+# S_EVOLUTION kết thúc -> S_MAKETEAM: gửi bằng cnm gì (nhìn gần create_cnm_evolution)
+scan(r"create_evolution_cnm|make_evolution_request|send_evolution_request|evolution_request_data|construct_evolution", "(2) hàm dựng request evolution")
+# REVIEW cnm_exist response có "evolution" completion data mà client đọc để hiển thị 8★ không
+scan(r"\"evolution_complete\"|evol_complete|EVOLUTION_COMPLETE_LIST|evolution_done", "(3) evolution_complete trong response")
+# DATA3 có dãy "6:A..." star đã mở? Tìm "char_num:star" trong save
+out.close()
+print("done -> _evolurl_out.txt")

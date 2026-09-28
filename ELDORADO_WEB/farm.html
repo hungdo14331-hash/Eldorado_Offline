@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Busidol Farm · Nông trại</title>
+<style>
+  :root {
+    --bg:#07130c;
+    --panel:linear-gradient(180deg,rgba(22,34,27,.94),rgba(11,18,13,.96));
+    --panel2:linear-gradient(180deg,rgba(18,28,21,.9),rgba(10,15,11,.94));
+    --line:rgba(139,175,150,.16);
+    --line-gold:rgba(232,193,90,.34);
+    --line-green:rgba(106,190,140,.35);
+    --accent:#4fc98a; --accent2:#7fd8b0;
+    --gold:#e8c15a; --gold2:#f6d78a; --gold-ink:#3a2600;
+    --ruby:#e34b63; --violet:#9a7bf0; --orange:#f29d4a;
+    --ie-blue:#5b8def;
+    --txt:#e9eef8; --dim:#93a3bd; --ok:#46c47a; --err:#e0605f;
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
+    --sh1:0 2px 8px rgba(0,0,0,.3);
+    --sh2:0 8px 22px rgba(0,0,0,.38);
+    --sh3:0 14px 34px rgba(0,0,0,.5);
+    --fs-cap:11px; --fs-sm:12px; --fs-body:13.5px; --fs-card:15px; --fs-h2:18px;
+    --fs-h1:clamp(24px,2.6vw,34px);
+    --sbw:252px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  button, input, select, textarea { font-family:inherit; }
+  html,body { height:100%; }
+  body {
+    background:var(--bg); color:var(--txt);
+    font:14px/1.5 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background-image:linear-gradient(rgba(4,11,7,.78),rgba(3,8,5,.9)),url("image/ui/1_mainmenu/mm_bg.jpg");
+    background-size:cover; background-position:center; background-attachment:fixed;
+  }
+  :focus-visible { outline:2px solid var(--accent2); outline-offset:2px; border-radius:6px; }
+  .app { display:flex; min-height:100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .side {
+    width:var(--sbw); flex:none; position:sticky; top:0; height:100vh;
+    background:linear-gradient(180deg,#0c1a12 0%,#08130d 55%,#06100a 100%);
+    border-right:1px solid var(--line-gold); display:flex; flex-direction:column;
+    padding:16px 12px 12px; z-index:5;
+  }
+  .brand { position:relative; text-align:center; padding:14px 8px 12px; margin-bottom:12px;
+           border:1px solid var(--line); border-radius:var(--r-md);
+           background:radial-gradient(120% 90% at 50% 0%,rgba(79,201,138,.16),rgba(79,201,138,0) 62%),
+                      linear-gradient(180deg,rgba(21,31,24,.9),rgba(11,17,14,.9));
+           box-shadow:var(--sh1); }
+  .brand img { width:148px; filter:drop-shadow(0 2px 8px rgba(0,0,0,.6)); }
+  .brand .tag { display:inline-block; margin-top:8px; font-size:var(--fs-cap); letter-spacing:2px; color:var(--gold);
+                border:1px solid var(--line-gold); padding:2px 10px; border-radius:20px;
+                background:rgba(232,193,90,.08); }
+  .nav { flex:1; overflow-y:auto; padding-right:4px; scrollbar-width:thin;
+         scrollbar-color:rgba(139,175,150,.3) transparent; }
+  .nav::-webkit-scrollbar { width:8px; }
+  .nav::-webkit-scrollbar-thumb { background:rgba(139,175,150,.26); border-radius:8px; }
+  .nav::-webkit-scrollbar-thumb:hover { background:rgba(139,175,150,.42); }
+  .nav .grp { position:relative; font-size:10px; letter-spacing:2px; color:var(--gold);
+              text-transform:uppercase; margin:16px 8px 8px; padding-bottom:6px; }
+  .nav .grp::after { content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
+                     background:linear-gradient(90deg,var(--line-gold),rgba(232,193,90,0)); }
+  .nav .grp:first-child { margin-top:2px; }
+  .nav button {
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:transparent; border:1px solid transparent; color:var(--txt);
+    padding:9px 11px; border-radius:var(--r-md); cursor:pointer; font-size:var(--fs-body); font-weight:600;
+    transition:background .15s, border-color .15s, color .15s; margin-bottom:3px;
+  }
+  .nav button .ic { width:27px; height:27px; flex:none; display:flex; align-items:center; justify-content:center;
+                    background:rgba(255,255,255,.06); border:1px solid var(--line);
+                    border-radius:var(--r-sm); font-size:15px; }
+  .nav button:hover { background:rgba(255,255,255,.05); border-color:var(--line); }
+  .nav button:hover .ic { background:rgba(255,255,255,.1); }
+  .nav button.on { background:linear-gradient(90deg,rgba(79,201,138,.16),rgba(79,201,138,.03) 70%,transparent);
+                   border-color:var(--line-green); color:#fff; box-shadow:inset 3px 0 0 var(--gold); }
+  .nav button.on .ic { background:rgba(79,201,138,.25); border-color:var(--line-green); }
+  .side-foot { margin-top:10px; padding:10px; border:1px solid var(--line); border-radius:var(--r-md);
+               background:linear-gradient(180deg,rgba(19,28,22,.85),rgba(10,16,13,.9)); }
+  .side-foot .srow { display:flex; align-items:center; gap:8px; font-size:var(--fs-sm); color:var(--dim); }
+  .side-foot .srow + .srow { margin-top:6px; }
+  .side-foot .srow .slab { flex:1; min-width:0; }
+  .side-foot b { color:var(--gold); font-size:var(--fs-body); font-variant-numeric:tabular-nums; }
+
+  /* ---------- Main / HUD ---------- */
+  .main { flex:1; min-width:0; padding:0 22px 40px; }
+  .hud { position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+         padding:10px 22px 12px; margin:0 -22px;
+         background:linear-gradient(180deg,rgba(4,11,7,.97) 0%,rgba(4,11,7,.86) 68%,rgba(4,11,7,0) 100%); }
+  .hud-res { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .res { display:flex; align-items:center; gap:6px; padding:4px 10px 4px 5px;
+         background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+         box-shadow:var(--sh1); transition:border-color .15s, background .15s; }
+  .res:hover { border-color:rgba(139,175,150,.36); }
+  .res img { height:22px; width:auto; }
+  .res b { font-size:var(--fs-body); font-variant-numeric:tabular-nums; color:var(--txt); }
+  .res.coin b { color:var(--gold); }
+  .res.ruby b { color:var(--ruby); }
+  .res.gold b { color:var(--gold); }
+  .res.gem b { color:var(--accent2); }
+  .warn-chip { display:flex; align-items:center; gap:8px; padding:7px 14px; cursor:pointer; font:inherit;
+               font-size:var(--fs-sm); font-weight:700; color:#ffd9d8;
+               background:linear-gradient(90deg,rgba(224,96,95,.26),rgba(224,96,95,.08));
+               border:1px solid rgba(224,96,95,.55); border-radius:var(--r-md); transition:filter .15s; }
+  .warn-chip:hover { filter:brightness(1.14); }
+  .load-chip { display:flex; align-items:center; gap:8px; padding:7px 14px; font-size:var(--fs-sm);
+               color:var(--dim); background:rgba(255,255,255,.03);
+               border:1px dashed var(--line); border-radius:var(--r-md); }
+  .back-chip { display:flex; align-items:center; gap:8px; margin-left:auto; padding:8px 16px; flex:none;
+               font-size:var(--fs-body); font-weight:700; color:#fff; text-decoration:none;
+               background:linear-gradient(180deg,#2f9d5e,#1e6b3f); border:1px solid rgba(130,220,160,.5);
+               border-radius:var(--r-md); box-shadow:0 3px 12px rgba(38,130,80,.35); transition:filter .15s; }
+  .back-chip:hover { filter:brightness(1.13); }
+
+  .view { margin-top:18px; animation:fade .25s ease; }
+  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
+  @media (prefers-reduced-motion:reduce){ .view { animation:none; } }
+
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px;
+          box-shadow:var(--sh2); }
+  .card h2 { font-size:var(--fs-h2); margin-bottom:4px; display:flex; align-items:center; gap:10px;
+             color:#fff; letter-spacing:.2px; }
+  .card .desc { color:var(--dim); font-size:var(--fs-body); margin-bottom:14px; }
+  .card.inner { background:linear-gradient(180deg,rgba(14,22,17,.74),rgba(8,12,9,.8));
+                border-radius:var(--r-md); padding:14px; box-shadow:none; }
+  .desc + .grid, .desc + .farming, .desc + .seedgrid, .desc + .char-grid { margin-top:12px; }
+
+  /* ---------- Hero / Buttons ---------- */
+  .hero { position:relative; overflow:hidden; border:1px solid var(--line-gold); border-radius:var(--r-xl);
+          min-height:216px; display:flex; flex-direction:column; justify-content:flex-end; padding:24px;
+          background:linear-gradient(105deg,rgba(6,14,9,.93) 0%,rgba(6,14,9,.6) 54%,rgba(6,14,9,.34) 100%),
+                     radial-gradient(90% 120% at 88% 12%,rgba(79,201,138,.18),rgba(6,14,9,0) 58%),
+                     url("image/ui/1_mainmenu/mm_bg.jpg");
+          background-size:cover; background-position:center;
+          box-shadow:var(--sh3); }
+  .hero::before { content:""; position:absolute; left:0; right:0; top:0; height:2px; pointer-events:none;
+                  background:linear-gradient(90deg,rgba(232,193,90,0),rgba(232,193,90,.8),rgba(232,193,90,0)); }
+  .hero::after { content:""; position:absolute; inset:0; pointer-events:none;
+                 background:radial-gradient(120% 110% at 50% 130%,rgba(3,8,5,.92),rgba(3,8,5,0) 60%); }
+  .hero > * { position:relative; z-index:1; }
+  .hero::after { z-index:1; }
+  .hero-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:.32; z-index:0; }
+  .hero .eyebrow { font-size:var(--fs-cap); letter-spacing:2.4px; text-transform:uppercase;
+                   color:var(--gold); margin-bottom:6px; }
+  .hero h1 { font-size:var(--fs-h1); line-height:1.15; letter-spacing:.4px;
+             text-shadow:0 2px 14px rgba(0,0,0,.85); }
+  .hero h1 em { font-style:normal; color:var(--gold2); }
+  .hero p { color:#cfdaee; max-width:640px; margin-top:8px; font-size:var(--fs-body);
+            text-shadow:0 1px 8px rgba(0,0,0,.85); }
+  .hero .act { margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { background:linear-gradient(180deg,#3db877,#238a53); border:1px solid rgba(130,220,160,.45);
+         border-radius:var(--r-md); color:#fff; padding:10px 20px; font:inherit; font-size:var(--fs-body);
+         font-weight:700; cursor:pointer; box-shadow:0 3px 12px rgba(74,118,216,.35);
+         transition:filter .15s, transform .12s; }
+  .btn:hover { filter:brightness(1.12); }
+  .btn img { height:18px; width:auto; display:inline-block; vertical-align:-3px; margin-right:2px; }
+  .btn:active { transform:translateY(1px); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; filter:none; transform:none; box-shadow:none; }
+  .btn.lg { padding:12px 24px; font-size:var(--fs-card); border-radius:14px; }
+  .btn.ghost { background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+               border-color:var(--line); box-shadow:none; }
+  .btn.ghost:hover { border-color:rgba(139,175,150,.42); background:rgba(255,255,255,.13); }
+  .btn.gold { background:linear-gradient(180deg,var(--gold2),#d9a63d); color:var(--gold-ink);
+              border-color:rgba(255,236,182,.7); box-shadow:0 4px 16px rgba(217,166,61,.4); }
+  .btn.ruby { background:linear-gradient(180deg,#e8768a,#c13a52); border-color:rgba(255,180,192,.5);
+              box-shadow:0 4px 16px rgba(193,58,82,.4); }
+  .btn.sm { padding:6px 12px; font-size:var(--fs-sm); border-radius:var(--r-sm); }
+
+  /* ---------- Nông trại (cảnh 2.5D isometric) ---------- */
+  .farm-scene { position:relative; width:100%; min-height:472px; overflow:auto;
+                border-radius:var(--r-lg); border:1px solid rgba(181,205,155,.2);
+                background:linear-gradient(180deg,rgba(33,49,29,.38),rgba(7,15,9,.58)),url("image/farm/backdrop_farm.png") center/cover no-repeat;
+                background-blend-mode:normal,normal; padding:10px 0 22px;
+                touch-action:pan-x; overscroll-behavior-x:contain; }
+  .farm-scene::before { content:""; position:absolute; inset:0; pointer-events:none;
+                        background:radial-gradient(ellipse at 50% 48%,rgba(7,14,8,0) 38%,rgba(4,10,6,.42) 100%); }
+  .farm-scene::after { content:""; position:absolute; left:0; right:0; bottom:0; height:22%; pointer-events:none;
+                       background:linear-gradient(180deg,transparent,rgba(5,12,7,.34)); }
+  .farm-scene::-webkit-scrollbar { height:10px; }
+  .farm-scene::-webkit-scrollbar-thumb { background:rgba(139,175,150,.34); border-radius:8px; }
+  .fworld { position:relative; width:680px; height:448px; margin:0 auto;
+            transform-origin:50% 0; transition:transform .15s ease; }
+  .farm-ground { display:none; position:absolute; left:54px; top:54px; width:574px; height:350px; z-index:0; pointer-events:none; }
+  .farm-ground .ground-shadow { position:absolute; left:15px; top:28px; width:544px; height:302px;
+                                clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                                background:rgba(0,0,0,.34); filter:blur(3px); transform:translateY(15px); }
+  .farm-ground .ground-bank { position:absolute; left:12px; top:20px; width:550px; height:304px;
+                              clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                              background:linear-gradient(180deg,#9a7040 0 48%,#56351f 49% 100%);
+                              box-shadow:0 14px 0 #21150e; }
+  .farm-ground .ground-sod { position:absolute; left:12px; top:10px; width:550px; height:304px;
+                             clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                             background:linear-gradient(180deg,rgba(102,135,63,.96),rgba(56,84,38,.92) 58%,rgba(38,55,29,.94));
+                             box-shadow:inset 0 0 0 5px rgba(184,172,95,.24); }
+  .farm-ground .ground-path { position:absolute; left:36px; top:26px; width:502px; height:272px;
+                              clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                              background:linear-gradient(180deg,rgba(52,75,35,.45),rgba(30,43,25,.18));
+                              border:2px solid rgba(207,190,113,.22); }
+.plot-iso { position:absolute; width:132px; height:126px; -webkit-user-select:none; user-select:none;
+               isolation:isolate; pointer-events:none; }
+  .plot-iso .pn { position:absolute; left:50%; top:2px; transform:translateX(-50%);
+                  font-size:10px; font-weight:800; color:var(--gold2); opacity:0; transition:opacity .12s;
+                  text-shadow:0 1px 2px rgba(0,0,0,.95); pointer-events:none; z-index:6; }
+  .plot-iso:not(:hover):not(.sel) .pn { opacity:0; }
+  .plot-iso:hover .pn, .plot-iso.sel .pn { opacity:1; }
+  .plot-iso .plot-depth { position:absolute; left:0; top:42px; width:132px; height:74px;
+                          clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                          background:linear-gradient(180deg,#704323 0 50%,#2d190f 51% 100%);
+                          image-rendering:pixelated; z-index:1; filter:drop-shadow(0 7px 0 rgba(22,11,6,.72));
+                          cursor:pointer; pointer-events:auto; }
+  .plot-iso .plot-face { position:absolute; left:0; top:32px; width:132px; height:74px;
+                    clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                    background:url("image/farm/tile_farmland.png") center/120% 120% no-repeat;
+                    image-rendering:pixelated; z-index:2; cursor:pointer; pointer-events:auto; }
+  .plot-iso.locked .plot-face { background-image:url("image/farm/tile_locked.png"); filter:brightness(.82) saturate(.75); }
+  .plot-iso .lock { position:absolute; left:50%; top:28px; transform:translateX(-50%); z-index:4;
+                    font-size:25px; filter:drop-shadow(0 3px 4px rgba(0,0,0,.65)); pointer-events:none; }
+  .plot-iso .crop { position:absolute; left:50%; transform:translateX(calc(-50% + 2px)); z-index:4;
+                    display:flex; align-items:flex-end; justify-content:center; cursor:pointer; pointer-events:auto; }
+  .plot-iso .crop img { width:auto; height:auto; max-height:140px; max-width:140px; object-fit:contain;
+                        image-rendering:pixelated; filter:drop-shadow(0 5px 1px rgba(26,14,7,.62)); }
+  .plot-iso .crop.seed img { height:33px; }
+  .plot-iso .crop.sprout img { height:60px; }
+  .plot-iso .crop.grow img { height:103px; }
+  .plot-iso .crop.ready img { height:130px; }
+  .plot-iso .crop.seed { bottom:50px; }
+  .plot-iso .crop.sprout { bottom:44px; }
+  .plot-iso .crop.grow { bottom:36px; }
+  .plot-iso .crop.ready { bottom:26px; }
+  .plot-iso .crop.ready img { filter:drop-shadow(0 5px 1px rgba(26,14,7,.62))
+                              drop-shadow(0 0 7px rgba(232,193,90,.72)); }
+  .plot-iso .plot-status { position:absolute; left:50%; top:19px; transform:translateX(-50%); z-index:5;
+                            min-width:9px; height:9px; padding:0 3px; border-radius:8px;
+                            background:rgba(189,206,175,.72); border:1px solid rgba(12,24,13,.82);
+                            color:#fff; font-size:7px; line-height:7px; text-align:center; pointer-events:none; }
+  .plot-iso .plot-status.ready { min-width:18px; background:var(--gold); color:#362000; }
+  .plot-iso .plot-status.growing { background:var(--accent2); }
+  .plot-iso .plot-detail { position:absolute; left:50%; top:0; transform:translate(-50%,-2px); z-index:7;
+                           opacity:0; pointer-events:none; white-space:nowrap; transition:opacity .12s;
+                           padding:3px 7px; border:1px solid rgba(232,193,90,.38); border-radius:7px;
+                           background:rgba(9,16,10,.9); color:#eaf0df; font-size:9px; line-height:1.15;
+                           box-shadow:0 3px 8px rgba(0,0,0,.35); }
+  .plot-iso:hover .plot-detail, .plot-iso.sel .plot-detail { opacity:1; }
+  .plot-iso .plot-detail b { color:var(--gold2); }
+  .plot-iso .plot-select { position:absolute; left:0; top:32px; width:132px; height:74px; z-index:3;
+                    clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);
+                    background:url("image/farm/plot_highlight.png") center/120% 120% no-repeat;
+                    image-rendering:pixelated; opacity:0; transition:opacity .12s; pointer-events:none; }
+  .plot-iso:hover:not(.sel) .plot-select { opacity:.72; }
+  .plot-iso.sel .plot-select { opacity:1; }
+  .fzoom { display:inline-flex; align-items:center; gap:6px; margin-left:auto; }
+  .fzoom .btn { min-width:42px; min-height:38px; padding:7px 12px; font-size:18px; line-height:1; }
+  .fzoom .zoom-readout { min-width:46px; color:var(--gold2); font-size:11px; font-variant-numeric:tabular-nums; text-align:center; }
+  .fzoom .zoom-help { color:var(--dim); font-size:10px; white-space:nowrap; }
+  .fpanel { margin-top:14px; border:1px solid rgba(139,175,150,.22); border-radius:var(--r-md);
+            background:linear-gradient(180deg,rgba(16,26,19,.9),rgba(9,14,11,.94));
+            padding:12px 14px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+            box-shadow:var(--sh1); }
+  .fpanel .fp-info { flex:1; min-width:220px; }
+  .fpanel .fp-kicker { color:var(--gold); font-size:10px; letter-spacing:1px; text-transform:uppercase; }
+  .fpanel .fp-name { font-weight:800; color:#fff; display:flex; align-items:center; gap:9px; }
+  .fpanel .fp-name img { height:20px; width:auto; }
+  .fpanel .fp-state { font-size:var(--fs-sm); color:var(--dim); margin-top:3px; }
+  .fpanel .fp-state b.ok { color:var(--ok); }
+  .fpanel .fp-meta { font-size:var(--fs-sm); color:var(--dim); margin-top:3px; }
+  .fpanel .fp-meta b { color:var(--gold2); }
+  .fpanel .fp-acts { display:flex; gap:10px; flex-wrap:wrap; }
+  .sc-em img { width:48px; height:48px; }
+  .ch-em img { width:54px; height:54px; object-fit:contain; border-radius:var(--r-md); }
+  .res-em img { width:20px; height:20px; vertical-align:-4px; }
+  .inv-em img { width:36px; height:36px; object-fit:contain; vertical-align:middle; margin-right:7px; }
+  .ic img { width:20px; height:20px; object-fit:contain; }
+
+  /* ---------- Tài nguyên / stat ---------- */
+  .resgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:10px; margin-bottom:14px; }
+  .stat-box { border:1px solid var(--line); border-radius:var(--r-md); padding:10px 12px;
+              background:linear-gradient(180deg,rgba(16,24,40,.74),rgba(9,14,26,.8)); }
+  .stat-box .k { font-size:var(--fs-cap); letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
+  .stat-box .v { margin-top:4px; font-size:19px; font-weight:800; color:var(--txt);
+                 font-variant-numeric:tabular-nums; }
+  .stat-box.gold { border-color:var(--line-gold);
+                   background:linear-gradient(180deg,rgba(232,193,90,.14),rgba(9,14,26,.8)); }
+  .stat-box.gold .v { color:var(--gold2); }
+  .stat-box.ruby { border-color:rgba(227,75,99,.4); }
+  .stat-box.ruby .v { color:var(--ruby); }
+  .rowline { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .lab { flex:none; font-weight:700; }
+  .rate { font-size:var(--fs-sm); color:var(--dim); }
+  .dim { color:var(--dim); }
+
+  /* ---------- Chợ hạt ---------- */
+  .seedgrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+  .seed-card { background:linear-gradient(180deg,rgba(16,26,19,.9),rgba(9,14,11,.94));
+               border:1px solid var(--line); border-radius:var(--r-md); padding:13px;
+               display:flex; flex-direction:column; gap:8px; }
+  .seed-card.epic { border-color:rgba(154,123,240,.4); }
+  .seed-card.legendary { border-color:var(--line-gold);
+                         background:linear-gradient(180deg,rgba(30,24,12,.9),rgba(13,11,8,.94)); }
+  .seed-card .sc-top { display:flex; align-items:center; gap:10px; }
+  .seed-card .sc-em { font-size:30px; line-height:1; }
+  .seed-card .sc-name { flex:1; min-width:0; font-weight:700; color:#fff; }
+  .seed-card .sc-kind { font-size:9px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+                        color:var(--dim); background:rgba(255,255,255,.05); border:1px solid var(--line);
+                        padding:2px 7px; border-radius:20px; white-space:nowrap; }
+  .seed-card.epic .sc-kind { color:var(--violet); border-color:rgba(154,123,240,.4); }
+  .seed-card.legendary .sc-kind { color:var(--gold); border-color:var(--line-gold);
+                                  background:rgba(232,193,90,.12); }
+  .seed-card .sc-meta { display:grid; grid-template-columns:1fr 1fr; gap:4px 10px; font-size:var(--fs-sm); color:var(--dim); }
+  .seed-card .sc-meta b { color:var(--txt); }
+  .seed-card .sc-buy { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .seed-card .sc-buy input { flex:1 1 70px; min-width:60px; background:rgba(9,14,11,.8);
+                             border:1px solid var(--line); color:var(--txt); border-radius:var(--r-sm);
+                             padding:6px 8px; font-size:var(--fs-body); }
+  .seed-card .sc-buy .btn { flex:none; }
+  .hint { font-size:var(--fs-cap); color:var(--dim); margin-top:8px; line-height:1.5; }
+
+  /* ---------- Kho / bán ---------- */
+  .inv-table { width:100%; border-collapse:collapse; font-size:var(--fs-sm); }
+  .inv-table th, .inv-table td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .inv-table tr:last-child td { border-bottom:0; }
+  .inv-table th { color:var(--gold); background:rgba(232,193,90,.08); text-transform:uppercase;
+                  font-size:10px; letter-spacing:1.2px; }
+  .inv-table tbody tr:nth-child(even) { background:rgba(255,255,255,.02); }
+  .inv-table td.qty { font-variant-numeric:tabular-nums; color:var(--gold2); font-weight:700; }
+  .inv-none { color:var(--dim); text-align:center; padding:22px; font-size:var(--fs-body); }
+
+  /* ---------- Nâng cấp / kỹ năng ---------- */
+  .upgrades { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+  .upg-card { background:linear-gradient(180deg,rgba(16,26,19,.9),rgba(9,14,11,.94));
+              border:1px solid var(--line); border-radius:var(--r-md); padding:14px; }
+  .upg-card .up-name { font-weight:700; color:#fff; margin-bottom:2px; }
+  .upg-card .up-desc { font-size:var(--fs-sm); color:var(--dim); margin-bottom:10px; }
+  .upg-card .up-lv { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .upg-card .up-bar { flex:1; height:8px; border-radius:6px; background:rgba(255,255,255,.07); overflow:hidden; }
+  .upg-card .up-fill { height:100%; border-radius:6px;
+                       background:linear-gradient(90deg,#3db877,#8fe3b8); transition:width .2s; }
+  .upg-card .up-num { font-size:var(--fs-sm); font-weight:700; color:var(--gold2); }
+  .skill-card { background:linear-gradient(180deg,rgba(16,26,19,.9),rgba(9,14,11,.94));
+                border:1px solid var(--line); border-radius:var(--r-md); padding:14px; }
+  .skill-card.owned { border-color:rgba(70,196,122,.45); }
+  .skill-card .sk-name { font-weight:700; color:#fff; }
+  .skill-card .sk-req { font-size:var(--fs-sm); color:var(--dim); margin:4px 0 8px; }
+  .skill-card .sk-req.ok { color:var(--ok); }
+  .skill-card .sk-req.no { color:var(--err); }
+  .skill-card .sk-cost { font-size:var(--fs-sm); color:var(--gold); font-weight:700; }
+
+  /* ---------- Nhân vật ---------- */
+  .char-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; }
+  .char-card { background:linear-gradient(180deg,rgba(20,28,24,.9),rgba(11,16,13,.94));
+               border:1px solid var(--line); border-radius:var(--r-md); padding:12px;
+               display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center; }
+  .char-card .ch-em { width:54px; height:54px; border-radius:var(--r-md); display:flex; align-items:center;
+                      justify-content:center; font-size:30px; border:1px solid var(--line);
+                      background:radial-gradient(120% 120% at 50% 0%,rgba(79,201,138,.2),rgba(255,255,255,.03)); }
+  .char-card .ch-name { font-weight:700; color:#fff; font-size:var(--fs-card); }
+  .char-card .ch-star { font-size:var(--fs-sm); color:var(--gold); letter-spacing:1px; }
+  .char-card .ch-id { font-size:var(--fs-cap); color:var(--dim); }
+  .char-card .ch-price { font-size:var(--fs-body); font-weight:800; color:var(--ruby); margin-top:2px; }
+  .char-card .btn { width:100%; }
+  .char-card.god { position:relative; opacity:.55; }
+  .char-card.god::after { content:"Thần · không bán"; position:absolute; inset:0; display:flex;
+                          align-items:center; justify-content:center; color:var(--err);
+                          background:rgba(5,8,6,.55); border-radius:var(--r-md); font-weight:700; font-size:var(--fs-sm); }
+
+  .sec { margin:18px 0 8px; font-size:var(--fs-card); color:#fff; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:12px; }
+
+  #toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%); max-width:min(90vw,520px);
+           padding:11px 20px; border-radius:var(--r-md); color:#fff; font-weight:700; font-size:var(--fs-body);
+           opacity:0; transition:opacity .25s; pointer-events:none; z-index:99; box-shadow:var(--sh3); }
+  #toast.ok { background:linear-gradient(180deg,#4fce84,#2f9d5e); }
+  #toast.err { background:linear-gradient(180deg,#e87a79,#c04a49); }
+
+  @media (max-width:1240px){
+    :root { --sbw:226px; }
+    .brand img { width:132px; }
+    .main { padding:0 18px 36px; }
+    .hud { margin:0 -18px; padding-left:18px; padding-right:18px; }
+    .hero { min-height:206px; padding:20px; }
+  }
+  @media (max-width:1024px){
+    :root { --sbw:204px; }
+    .side { padding:12px 10px 10px; }
+    .brand { padding:10px 6px; } .brand img { width:118px; }
+    .nav button { padding:8px 9px; font-size:var(--fs-sm); }
+    .nav button .ic { width:24px; height:24px; font-size:14px; }
+    .back-chip { margin-left:0; }
+  }
+  @media (max-width:900px){
+    :root { --sbw:100%; }
+    .app { flex-direction:column; }
+    .side { position:static; height:auto; width:100%; border-right:0;
+            border-bottom:1px solid var(--line-gold); padding:12px; }
+    .brand { display:flex; align-items:center; gap:10px; text-align:left; padding:8px 10px; margin-bottom:10px; }
+    .brand img { width:104px; }
+    .brand .tag { margin-top:0; margin-left:auto; }
+    .nav { display:flex; flex-wrap:wrap; gap:4px; overflow:visible; padding-right:0; }
+    .nav .grp { width:100%; margin:8px 4px 4px; }
+    .nav button { width:auto; flex:1 1 46%; padding:8px 10px; margin-bottom:0; }
+    .side-foot { display:flex; gap:10px; margin-top:8px; }
+    .side-foot .srow { flex:1; justify-content:space-between; }
+    .side-foot .srow + .srow { margin-top:0; }
+    .main { padding:0 14px 30px; }
+    .hud { position:static; margin:0 -14px; padding:10px 14px 12px; gap:8px; }
+    .res { padding:3px 8px 3px 4px; } .res img { height:18px; }
+    .res b { font-size:var(--fs-sm); }
+    .back-chip { margin-left:0; }
+    .hero { min-height:190px; padding:18px; }
+    .hero .act .btn { flex:1 1 auto; text-align:center; }
+    .card { padding:14px; }
+  }
+  @media (max-width:640px){
+    .card h2 { align-items:flex-start; gap:8px; }
+    .farm-title { flex:1 1 126px; min-width:126px; }
+    .grid, .seedgrid, .char-grid { grid-template-columns:1fr; }
+    .nav button { flex:1 1 100%; }
+    .hero { min-height:174px; padding:16px; }
+    .hero h1 { font-size:22px; }
+    .back-chip { flex:1 1 100%; justify-content:center; }
+    .farm-scene { min-height:438px; }
+    .fworld { width:680px; height:428px; margin-left:16px; }
+    .fzoom { flex-wrap:wrap; justify-content:flex-end; }
+    .fzoom .zoom-help { flex-basis:100%; text-align:right; }
+    .fpanel { flex-direction:column; align-items:stretch; }
+    .fpanel .fp-acts { justify-content:stretch; }
+    .fpanel .fp-acts .btn { flex:1 1 auto; justify-content:center; min-height:42px; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="app">
+    <aside class="side">
+      <div class="brand">
+        <img src="image/bg/introLogo_en.png" alt="Eldorado">
+        <span class="tag">BUSIDOL · FARM</span>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot">
+        <div class="srow"><span class="slab">Ví ruby</span><b id="side_ruby">0</b></div>
+        <div class="srow"><span class="slab">Xu farm</span><b id="side_coins">0</b></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="hud" id="hud"></header>
+      <section class="view" id="view"></section>
+    </main>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n||0).toLocaleString("en-US");
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+let S = null;      // farm state (farm/bootstrap.php)
+let SEEDS = null;  // SEED_DESIGN (farm/seeds.php)
+let SKILLS = null; // SKILL_DESIGN (farm/seeds.php)
+let CAT = null;    // buy_character.catalog (bootstrap)
+let PRICE = {};    // buy_character.price — giá ruby theo sao
+let CONN = true;
+const tRef = {};   // các bộ đếm hiển thị thời gian chờ
+
+async function api(path, data) {
+  const b = new URLSearchParams();
+  for (const k of Object.keys(data||{})) b.append(k, data[k]);
+  let res;
+  try { res = await fetch(path, { method:"POST", body:b.toString() }); }
+  catch(e) { return { STATE:"ERROR", msg:"network" }; }
+  try { return await res.json(); } catch(e) { return { STATE:"ERROR" }; }
+}
+
+function toast(msg, ok) {
+  const t = $("toast"); t.className = ok ? "ok" : "err"; t.textContent = msg;
+  t.style.opacity = 1; clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.style.opacity = 0, 2600);
+}
+function netFail(quiet) {
+  CONN = false; renderHud();
+  if (!quiet) toast("Không gọi được máy chủ — bấm ⚠️ để thử lại", false);
+}
+async function retryAll() {
+  toast("Đang kết nối lại…", true);
+  CONN = await loadAll();
+  renderHud();
+  toast(CONN ? "Đã kết nối lại ✅" : "Vẫn chưa tải được máy chủ", CONN);
+}
+function activeView() {
+  const on = document.querySelector(".nav button.on");
+  const hash = location.hash.replace(/^#/, "");
+  return ["home", "farm", "market", "storage", "upgrade", "skill", "chars"].includes(hash)
+    ? hash : (on ? on.dataset.v : "home");
+}
+
+/* ================= Tải dữ liệu ================= */
+const FIMG = "image/farm/";
+const fim = f => `<img src="${FIMG}${f}" alt="" loading="lazy">`;
+function cropStage(p) {
+  const cfg = SEEDS && SEEDS[p.seed] ? SEEDS[p.seed] : {};
+  const grow = Number(p.grow_sec || cfg.grow_sec || 0);
+  if (!grow) return "ready";
+  const pr = (Date.now()/1000 - Number(p.planted_at||0)) / grow;
+  if (pr >= 1) return "ready";
+  if (pr >= 0.7) return "grow";
+  if (pr >= 0.3) return "sprout";
+  return "seed";
+}
+async function loadState() {
+  const r = await api("farm/bootstrap.php", {});
+  if (r.STATE !== "SUCCESS") { netFail(true); return false; }
+  S = r.farm;
+  CAT = (r.buy_character && r.buy_character.catalog) || null;
+  PRICE = (r.buy_character && r.buy_character.price) || {};
+  return true;
+}
+async function loadSeeds() {
+  const r = await api("farm/seeds.php", {});
+  if (r.STATE !== "SUCCESS") { netFail(true); return false; }
+  SEEDS = r.seeds;
+  SKILLS = r.skills || {};
+  return true;
+}
+async function loadAll() {
+  const [a, b] = await Promise.all([loadState(), loadSeeds()]);
+  renderHud();
+  return a && b;
+}
+
+/* ================= HUD ================= */
+const RES_META = {
+  coins:   { img:"icon_coins.png",   name:"Xu farm" },
+  gold:    { img:"icon_gold.png",    name:"Vàng" },
+  diamond: { img:"icon_diamond.png", name:"Kim cương" },
+  ruby:    { img:"icon_ruby.png",    name:"Ruby" },
+};
+function renderHud() {
+  const res = Object.keys(RES_META).map(k =>
+    `<div class="res ${k}" title="${RES_META[k].name}"><span class="res-em">${fim(RES_META[k].img)}</span><b>${S ? fmt(S[k]||0) : "…"}</b></div>`
+  ).join("");
+  $("hud").innerHTML = `<div class="hud-res">${res}</div>` +
+    (CONN ? "" : `<button type="button" class="warn-chip" onclick="retryAll()">⚠️ Mất kết nối · Thử lại</button>`) +
+    `<a class="back-chip" href="rubyfarm.html">🌾 Về RubyFarm</a>`;
+  $("side_ruby").textContent = S ? fmt(S.ruby) : "—";
+  $("side_coins").textContent = S ? fmt(S.coins) : "—";
+}
+
+/* ================= Điều hướng ================= */
+function buildNav() {
+  $("nav").innerHTML = `
+    <div class="grp">Chính</div>
+    <button data-v="home" onclick="navigate('home')"><span class="ic">🏠</span> Trang chủ</button>
+    <button data-v="farm" onclick="navigate('farm')"><span class="ic">${fim("icon_plant.png")}</span> Nông trại</button>
+    <button data-v="market" onclick="navigate('market')"><span class="ic">${fim("icon_sell.png")}</span> Chợ hạt</button>
+    <button data-v="storage" onclick="navigate('storage')"><span class="ic">${fim("icon_harvest.png")}</span> Kho &amp; Bán</button>
+    <div class="grp">Phát triển</div>
+    <button data-v="upgrade" onclick="navigate('upgrade')"><span class="ic">${fim("icon_upgrade.png")}</span> Nâng cấp</button>
+    <button data-v="skill" onclick="navigate('skill')"><span class="ic">${fim("icon_skill.png")}</span> Kỹ năng</button>
+    <button data-v="chars" onclick="navigate('chars')"><span class="ic">${fim("icon_char.png")}</span> Nhân vật</button>`;
+}
+
+function navigate(v) {
+  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  const view = $("view");
+  view.innerHTML = "";
+  if (v === "home") pageHome();
+  else if (v === "farm") pageFarm();
+  else if (v === "market") pageMarket();
+  else if (v === "storage") pageStorage();
+  else if (v === "upgrade") pageUpgrade();
+  else if (v === "skill") pageSkill();
+  else if (v === "chars") pageChars();
+  window.scrollTo({ top:0 });
+}
+
+/* ================= Trang chủ ================= */
+function pageHome() {
+  const ready = (S.slots || []).filter((p, i) => p && i < Number(S.unlocked_count) && readyNow(p)).length;
+  const seedsOwned = Object.keys(S.inventory||{}).filter(k => k.startsWith("seed:")).length;
+  $("view").innerHTML = `
+    <div class="hero">${fim("backdrop_farm.png").replace('<img src=', '<img class="hero-bg" src=')}
+      <div class="eyebrow">Nông trại Busidol</div>
+      <h1>BUSIDOL <em>FARM</em></h1>
+      <p>Trồng cây, thu hoạch, bán lấy xu — và ruby về thẳng ví. Nâng cấp nhánh, học kỹ năng, đổi ruby lấy nhân vật gửi vào hòm thư.</p>
+      <div class="act">
+        <button class="btn gold lg" onclick="navigate('farm')">${fim("icon_plant.png")} Vào nông trại</button>
+        <button class="btn ghost lg" onclick="navigate('chars')">${fim("icon_char.png")} Mua nhân vật</button>
+      </div>
+    </div>
+    <div class="resgrid" style="margin-top:16px">
+      <div class="stat-box gold"><div class="k">Xu</div><div class="v">${fmt(S.coins||0)}</div></div>
+      <div class="stat-box ruby"><div class="k">Ruby ví</div><div class="v">${fmt(S.ruby||0)}</div></div>
+      <div class="stat-box"><div class="k">Đất mở</div><div class="v">${Number(S.unlocked_count)}/${Number(S.slots_total)}</div></div>
+      <div class="stat-box"><div class="k">Cây sẵn thu</div><div class="v">${ready}</div></div>
+      <div class="stat-box"><div class="k">Hạt trong kho</div><div class="v">${seedsOwned} loại</div></div>
+    </div>`;
+}
+
+/* ================= Nông trại ================= */
+let SEL = 0;      // ô đang chọn (panel thao tác)
+let FZOOM = 1;
+const FCOLS = 5, FROWS = 4;
+const FTILE_X = 68, FTILE_Y = 38;   // nhịp lưới isometric
+const FZOOM_MIN = 0.75, FZOOM_MAX = 1.45, FZOOM_STEP = 0.15;
+function isoPos(i) {
+  const col = i % FCOLS, row = Math.floor(i / FCOLS);
+  return { x: 274 + (col - row) * FTILE_X, y: 42 + (col + row) * FTILE_Y,
+           z: 20 + (col + row) * 10 + col };
+}
+function readyNow(plot) {
+  if (!plot || !plot.seed || !SEEDS || !SEEDS[plot.seed]) return false;
+  const grow = Number(plot.grow_sec || SEEDS[plot.seed].grow_sec || 0);
+  return (Date.now()/1000) - Number(plot.planted_at||0) >= grow;
+}
+function isoPlotHTML(i) {
+  const p = (S.slots||[])[i] || null;
+  const unlocked = i < Number(S.unlocked_count);
+  const { x, y, z } = isoPos(i);
+  let body, status = "empty", detail = "Đất trống";
+  if (!unlocked) {
+    status = "locked";
+    detail = "Ô khóa";
+    body = `<div class="plot-depth"></div><div class="plot-face"></div><span class="lock">🔒</span>`;
+  } else if (!p) {
+    body = `<div class="plot-depth"></div><div class="plot-face"></div>`;
+  } else {
+    const ready = readyNow(p);
+    const st = cropStage(p);
+    const cfg = SEEDS && SEEDS[p.seed] ? SEEDS[p.seed] : null;
+    const left = Math.max(0, Math.ceil(Number(p.planted_at) + Number(p.grow_sec || cfg?.grow_sec || 0) - Date.now()/1000));
+    status = ready ? "ready" : "growing";
+    detail = `${esc((cfg&&cfg.name_vi)||p.seed)} · ${ready ? "Sẵn sàng" : timeStr(left)}`;
+    body = `<div class="plot-depth"></div><div class="plot-face"></div>
+      <div class="crop ${st}">${fim(`crop_${p.seed}_${st}.png`)}</div>`;
+    if (!ready) tRef[i] = i;
+  }
+  return `<div class="plot-iso ${i===SEL?"sel":""} ${unlocked?"":(p?"":"locked")} ${!p&&unlocked?"empty":""}"
+    data-slot-id="${i + 1}" data-status="${status}" aria-label="Ô ${i + 1}: ${detail}"
+    style="left:${x}px;top:${y}px;z-index:${z}" onclick="selectPlot(${i})">
+    <span class="pn">Ô ${i+1}</span><span class="plot-detail"><b>Ô ${i+1}</b> · ${detail}</span>
+    ${body}<span class="plot-status ${status === "ready" ? "ready" : status === "growing" ? "growing" : ""}">${status === "ready" ? "✓" : status === "growing" ? "•" : ""}</span>
+    <span class="plot-select"></span></div>`;
+}
+function farmPanelHTML() {
+  const p = (S.slots||[])[SEL] || null;
+  const unlocked = SEL < Number(S.unlocked_count);
+  let body, actin, status = "Đất trống", timeLeft = "";
+  const cfg = p && SEEDS && SEEDS[p.seed] ? SEEDS[p.seed] : null;
+  if (!unlocked) {
+    status = "Ô khóa";
+    body = `<div class="fp-state">Mở ô này để tiếp tục canh tác.</div>`;
+    actin = `<button class="btn sm ghost" onclick="unlockPlot()">Mở khóa ・ ${fmt(Number(S.next_unlock_cost))} xu</button>`;
+  } else if (!p) {
+    body = `<div class="fp-state">Đất trống — chọn hạt để trồng.</div><div class="fp-meta">Tên cây / thời gian: <b>Chưa có</b></div>`;
+    actin = `<button class="btn sm" onclick="plantPicker()">Trồng</button>`;
+  } else {
+    const ready = readyNow(p);
+    const left = Math.max(0, Math.ceil(Number(p.planted_at) + Number(p.grow_sec||cfg.grow_sec||0) - Date.now()/1000));
+    status = ready ? "Sẵn sàng thu hoạch" : "Đang lớn";
+    timeLeft = ready ? 0 : left;
+    body = `<div class="fp-name">${fim(`crop_${p.seed}_${cropStage(p)}.png`)} ${esc((cfg&&cfg.name_vi)||p.seed)}</div>
+      <div class="fp-state ${ready ? "ok" : ""}" data-status="${status}">${ready ? "✅ Sẵn sàng thu hoạch" : `<span data-wait="${SEL}">Còn ${timeStr(left)}</span>`}</div>
+      <div class="fp-meta" data-time-left="${timeLeft}">Thời gian còn lại: <b>${ready ? "đã chín" : timeStr(left)}</b></div>`;
+    actin = `<button class="btn sm ${ready ? "gold" : ""}" ${ready ? "" : "disabled"} onclick="harvestPlot()">Thu hoạch</button>`;
+  }
+  return `<div class="fpanel" data-slot-id="${SEL + 1}" data-status="${status}" data-time-left="${timeLeft}">
+    <div class="fp-info"><div class="fp-kicker">Ô ${SEL + 1} · ${status}</div>${!p ? `<div class="fp-name">${esc("Ô " + (SEL+1))}</div>` : ""}${body}</div>
+    <div class="fp-acts">${actin}</div></div>`;
+}
+function pageFarm() {
+  const total = Number(S.slots_total);
+  const unlocked = Number(S.unlocked_count);
+  const tiles = [];
+  for (let i = 0; i < total; i++) tiles.push(isoPlotHTML(i));
+  $("view").innerHTML = `
+    <div class="card">
+      <h2><span class="farm-title">🌱 Nông trại</span>
+        <span class="fzoom">
+          <button class="btn sm ghost" aria-label="Thu nhỏ ruộng" title="Thu nhỏ ruộng (75–145%)" onclick="zoomFarm(-1)">−</button>
+          <span class="zoom-readout" id="zoomLabel">100%</span>
+          <button class="btn sm ghost" aria-label="Phóng to ruộng" title="Phóng to ruộng (75–145%)" onclick="zoomFarm(1)">+</button>
+          <span class="zoom-help">75–145% · cuộn ngang để xem đủ ruộng</span>
+        </span></h2>
+      <div class="desc">Đất ${unlocked}/${total} · trạng thái cây theo máy chủ. Bấm ô để xem ID, tên cây, thời gian và hành động.</div>
+      <div class="farm-scene"><div class="fworld" id="fworld" data-zoom="${FZOOM}" style="transform:scale(${FZOOM})">
+        <div class="farm-ground" aria-hidden="true"><span class="ground-shadow"></span><span class="ground-bank"></span><span class="ground-sod"></span><span class="ground-path"></span></div>
+        ${tiles.join("")}</div></div>
+      ${farmPanelHTML()}
+    </div>`;
+  applyZoom();
+  tickTimers();
+}
+function selectPlot(i) {
+  SEL = i;
+  pageFarm();
+}
+function zoomFarm(d) {
+  FZOOM = Math.min(FZOOM_MAX, Math.max(FZOOM_MIN, Math.round((FZOOM + d * FZOOM_STEP) * 100) / 100));
+  applyZoom();
+}
+function applyZoom() {
+  const w = $("fworld");
+  if (!w) return;
+  w.style.transform = "scale(" + FZOOM + ")";
+  w.dataset.zoom = FZOOM.toFixed(2);
+  const label = $("zoomLabel"); if (label) label.textContent = Math.round(FZOOM * 100) + "%";
+  document.querySelectorAll(".fzoom button").forEach((b, i) => {
+    b.disabled = i === 0 ? FZOOM <= FZOOM_MIN : FZOOM >= FZOOM_MAX;
+  });
+}
+
+function tickTimers() {
+  clearInterval(tRef._iv);
+  tRef._iv = setInterval(() => {
+    let dirty = false;
+    document.querySelectorAll("[data-wait]").forEach(el => {
+      const i = Number(el.dataset.wait);
+      const p = (S.slots||[])[i];
+      if (!p || !SEEDS || !SEEDS[p.seed]) { el.textContent = ""; dirty = true; return; }
+      const left = Math.ceil(Number(p.planted_at) + Number(p.grow_sec||SEEDS[p.seed].grow_sec||0) - Date.now()/1000);
+      if (left <= 0) { dirty = true; return; }
+      el.textContent = timeStr(left);
+    });
+    if (dirty) pageFarm(); // ô nào chín — vẽ lại toàn bộ
+  }, 1000);
+}
+
+function timeStr(sec) {
+  sec = Math.max(0, Math.round(sec));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  if (h) return h + "g " + m + "p";
+  if (m) return m + "p " + s + "s";
+  return s + "s";
+}
+
+function plantPicker(slot) {
+  slot = (slot == null) ? SEL : slot;
+  const owned = Object.entries(S.inventory||{}).filter(([k, q]) => k.startsWith("seed:") && Number(q||0) > 0);
+  if (!owned.length) { toast("Chưa có hạt — mua ở Chợ hạt", false); navigate("market"); return; }
+  const list = owned.map(([k, q], i) => {
+    const seed = k.slice(5);
+    const cfg = SEEDS && SEEDS[seed] ? SEEDS[seed] : null;
+    return `${i+1}) ${cfg ? esc(cfg.name_vi) : seed} (${seed}) · còn ${q}`;
+  });
+  const n = parseInt(prompt(`Chọn hạt trồng vào ô ${slot+1}:\n\n${list.join("\n")}`), 10);
+  if (!n || n < 1 || n > owned.length) return;
+  plant(slot, owned[n-1][0].slice(5));
+}
+
+async function plant(slot, seed) {
+  const r = await api("farm/plant.php", { seed, slot });
+  if (r.STATE === "SUCCESS") { await loadState(); pageFarm(); }
+  else { errState(r); if (r.msg === "NOT_FOUND") navigate("farm"); }
+}
+async function harvestPlot(slot) {
+  slot = (slot == null) ? SEL : slot;
+  const r = await api("farm/harvest.php", { slot });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã thu hoạch 🧺", true);
+    await loadState(); pageFarm();
+  } else { errState(r); pageFarm(); }
+}
+async function unlockPlot(slot) {
+  slot = (slot == null) ? SEL : slot;
+  const r = await api("farm/unlock_slot.php", {});
+  if (r.STATE === "SUCCESS") {
+    toast("Đã mở 1 ô đất ⛏️", true);
+    await loadState(); pageFarm();
+  } else { errState(r); pageFarm(); }
+}
+
+function errState(r) {
+  const m = r.msg || r.message || "Lỗi";
+  const map = { INSUFFICIENT_FUNDS:"Không đủ tiền", NOT_READY:"Cây chưa chín", ALL_UNLOCKED:"Đã mở hết đất",
+                NO_ITEM:"Không có trong kho", SEED_NOT_FOUND:"Hạt không có", BAD_QTY:"Số lượng không hợp lệ",
+                NETWORK:"Lỗi kết nối", SLOT_BUSY:"Ô đã có cây", SLOT_LOCKED:"Ô chưa mở", SLOT_NOT_FOUND:"Ô không tồn tại",
+                NO_SEED:"Không còn hạt", MAX_LEVEL:"Đã đạt cấp tối đa", BRANCH_NOT_FOUND:"Nhánh không tồn tại",
+                SEED_NOT_RUBY:"Hạt này không bán bằng ruby", BAD_CURRENCY:"Loại tiền không hợp lệ",
+                ITEM_NOT_SELLABLE:"Không thể bán vật phẩm này", INSUFFICIENT_RUBY:"Không đủ ruby",
+                INVALID_CHARACTER:"Nhân vật không tồn tại", NOT_FOR_SALE:"Nhân vật này không bán",
+                MISSING_CHARACTER:"Thiếu mã nhân vật" };
+  toast(map[m] || m, false);
+}
+
+/* ================= Chợ hạt ================= */
+const RARITY_ORDER = ["common", "rare", "epic", "legendary"];
+const RARITY_VI = { common:"bình thường", rare:"hiếm", epic:"cao cấp", legendary:"huyền thoại" };
+function pageMarket() {
+  if (!SEEDS) { $("view").innerHTML = `<div class="card"><div class="desc">⏳ Đang tải…</div></div>`; return; }
+  const cards = RARITY_ORDER.map(rarity => {
+    const list = Object.entries(SEEDS).filter(([, c]) => c.rarity === rarity);
+    if (!list.length) return "";
+    return `<div class="sec" style="margin-top:0">Bậc ${rarity}</div>
+      <div class="seedgrid">${list.map(([seed, cfg]) => {
+        const rubyOk = Number(cfg.ruby_cost||0) > 0;
+        return `<div class="seed-card ${rarity}">
+          <div class="sc-top">
+            <span class="sc-em">${fim(`crop_${seed}_ready.png`)}</span>
+            <span class="sc-name">${esc(cfg.name_vi)}</span>
+            <span class="sc-kind">${esc(RARITY_VI[rarity])}</span>
+          </div>
+          <div class="sc-meta">
+            <span>Mọc · <b>${timeStr(cfg.grow_sec)}</b></span>
+            <span>Hạt · <b>${fmt(cfg.cost)}</b> xu</span>
+            <span>Bán · <b>${fmt(cfg.sell)}</b> xu</span>
+            <span>Ruby · <b>${rubyOk ? fmt(cfg.ruby_cost) : "—"}</b></span>
+          </div>
+          <div class="sc-buy">
+            <input type="number" id="q_${seed}" min="1" max="999" value="1">
+            <button class="btn sm" onclick="buySeed('${seed}','coins')">Mua ${fmt(cfg.cost)} xu</button>
+            ${rubyOk ? `<button class="btn sm ruby" onclick="buySeed('${seed}','ruby')">Mua ${fmt(cfg.ruby_cost)} 💎</button>` : ""}
+          </div>
+        </div>`;
+      }).join("")}</div>`;
+  }).join("");
+  $("view").innerHTML = `<div class="card"><h2>🛒 Chợ hạt</h2>
+    <div class="desc">Mua hạt bằng xu farm hoặc bằng ruby ví khi có giá. Ruby mua hạt không bị giảm giá nâng cấp — chỉ xu mới giảm.</div>
+    ${cards}
+    <div class="hint">Mua bằng ruby chỉ áp dụng cho hạt bậc cao cấp (màu tím) và huyền thoại (vàng).</div></div>`;
+}
+
+async function buySeed(seed, currency) {
+  const inp = $("q_" + seed); if (!inp) return;
+  const qty = parseInt(inp.value, 10) || 1;
+  const r = await api("farm/buy_seed.php", { seed, qty, currency });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã mua " + qty + " hạt “" + (SEEDS[seed] ? SEEDS[seed].name_vi : seed) + "”", true);
+    await loadState(); renderHud();
+  } else errState(r);
+}
+
+/* ================= Kho & Bán ================= */
+function pageStorage() {
+  const inv = S.inventory || {};
+  const rows = [];
+  for (const [k, q] of Object.entries(inv)) {
+    if (Number(q) <= 0) continue;
+    if (k.startsWith("crop:")) {
+      const seed = k.slice(5);
+      const cfg = SEEDS && SEEDS[seed] ? SEEDS[seed] : null;
+      const price = cfg ? fmt(cfg.sell) : "?";
+      const rubyBonus = cfg && Number(cfg.sell_ruby||0) > 0 ? ` +${cfg.sell_ruby} 💎` : "";
+      rows.push(`<tr><td><span class="inv-em">${fim(`crop_${seed}_ready.png`)}</span>${esc(cfg ? cfg.name_vi : seed)}</td><td class="qty">${q}</td>
+        <td>${price} xu${rubyBonus}</td><td class="act-cell">
+          <input type="number" id="s_${seed}" min="1" max="${q}" value="${Math.min(1,q)}" style="width:64px;background:rgba(9,14,11,.8);border:1px solid var(--line);color:var(--txt);border-radius:var(--r-sm);padding:6px 8px;font-size:var(--fs-body)">
+          <button class="btn sm" onclick="sellCrop('${seed}')">Bán</button></td></tr>`);
+    } else {
+      const seed = k.slice(5);
+      const cfg = SEEDS && SEEDS[seed] ? SEEDS[seed] : null;
+      rows.push(`<tr><td><span class="inv-em">${fim("item_seed_bag.png")}</span>${esc(cfg ? cfg.name_vi : seed)} (hạt)</td><td class="qty">${q}</td><td>—</td><td>Dùng để trồng</td></tr>`);
+    }
+  }
+  $("view").innerHTML = `<div class="card"><h2>📦 Kho &amp; Bán</h2>
+    <div class="desc">Trái đã thu hoạch nằm đây — bán lấy xu, hạt bậc 3/4 còn kèm thưởng ruby về ví.</div>
+    ${rows.length ? `<table class="inv-table"><thead><tr><th>Vật phẩm</th><th>Số lượng</th><th>Giá bán</th><th></th></tr></thead>
+      <tbody>${rows.join("")}</tbody></table>` : `<div class="inv-none">Kho trống — trồng cây trong Nông trại và thu hoạch nhé 🧺</div>`}</div>`;
+}
+
+async function sellCrop(seed) {
+  const inp = $("s_" + seed); if (!inp) return;
+  const qty = parseInt(inp.value, 10) || 1;
+  const r = await api("farm/sell.php", { item: "crop:" + seed, qty });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã bán " + qty + " trái 🪙", true);
+    await loadState(); renderHud(); pageStorage();
+  } else errState(r);
+}
+
+/* ================= Nâng cấp ================= */
+const BRANCH_META = {
+  grow_speed: { name:"Tăng tốc phát triển", em:"⚡", desc:"Mọc nhanh hơn: /(1 + 0.15×cấp)" },
+  grow_time:  { name:"Giảm thời gian lớn",  em:"⏱️", desc:"−30 giây/cấp (thêm −20s nếu có kỹ năng)" },
+  sell_price: { name:"Tăng giá bán",        em:"💰", desc:"Giá bán ×(1 + 0.10×cấp)" },
+  seed_cost:  { name:"Giảm giá hạt",        em:"🪙", desc:"Hạt rẻ ×(1 − 0.10×cấp), tối thiểu 1" },
+};
+function pageUpgrade() {
+  const up = S.upgrades || {};
+  const cost = S.upgrade_cost || {};
+  const cards = Object.entries(BRANCH_META).map(([br, meta]) => {
+    const lv = Number(up[br]||0);
+    const full = lv >= 5;
+    return `<div class="upg-card">
+      <div class="up-name">${meta.em} ${esc(meta.name)}</div>
+      <div class="up-desc">${esc(meta.desc)}</div>
+      <div class="up-lv">
+        <span class="up-num">Cấp ${lv}/5</span>
+        <div class="up-bar"><div class="up-fill" style="width:${lv/5*100}%"></div></div>
+      </div>
+      <button class="btn sm ${full ? "ghost" : ""}" ${full ? "disabled" : ""} onclick="upgradeBranch('${br}')">
+        ${full ? "Đã tối đa" : `Nâng cấp ・ ${fmt(cost[br]||0)} xu`}
+      </button>
+    </div>`;
+  }).join("");
+  $("view").innerHTML = `<div class="card"><h2>⬆️ Nâng cấp</h2>
+    <div class="desc">4 nhánh, tối đa cấp 5. Chi phí tăng theo cấp (120, 480, 1080, 1920, 3000 xu). Nâng cấp giúp mở khóa kỹ năng ở cấp 3 trở lên.</div>
+    <div class="upgrades">${cards}</div></div>`;
+}
+async function upgradeBranch(br) {
+  const r = await api("farm/upgrade.php", { branch: br });
+  if (r.STATE === "SUCCESS") { toast("Nâng cấp xong ✅", true); await loadState(); renderHud(); pageUpgrade(); }
+  else errState(r);
+}
+
+/* ================= Kỹ năng ================= */
+const SKILL_META = {
+  green_thumb:  { em:"✋", name:"Bàn tay xanh",        desc:"Bán thêm +5% (chồng với nâng cấp giá bán)" },
+  quick_hands:  { em:"🤲", name:"Tay thoăn thoắt",     desc:"Cây mọc thêm nhanh −20 giây" },
+  fertilize:    { em:"💩", name:"Phân bón siêu cấp",   desc:"Mọc nhanh thêm +15%" },
+  bulk_discount:{ em:"🧾", name:"Mua sỉ",              desc:"Giá hạt rẻ thêm −5%" },
+};
+function pageSkill() {
+  const up = S.upgrades || {};
+  const owned = S.skills || [];
+  const cards = Object.entries(SKILL_META).map(([sk, meta]) => {
+    const cfg = SKILLS && SKILLS[sk];
+    const br = cfg ? cfg.require_branch : BRANCH_INFO(sk).br;
+    const lv = cfg ? Number(cfg.require_level) : BRANCH_INFO(sk).lv;
+    const cost = cfg ? Number(cfg.cost) : 5000;
+    const ready = Number(up[br] || 0) >= lv;
+    const has = owned.includes(sk);
+    if (has) return `<div class="skill-card owned">
+      <div class="sk-name">${meta.em} ${esc(meta.name)} <span style="color:var(--ok)">✓ đã học</span></div>
+      <div class="sk-desc dim">${esc(meta.desc)}</div></div>`;
+    return `<div class="skill-card">
+      <div class="sk-name">${meta.em} ${esc(meta.name)}</div>
+      <div class="sk-req ${ready ? "ok" : "no"}">Cần ${esc(BRANCH_META[br].name)} cấp ${lv}</div>
+      <div class="sk-desc dim">${esc(meta.desc)}</div>
+      <div class="rowline"><span class="sk-cost">${fmt(cost)} xu</span>
+      <button class="btn sm gold" ${ready ? "" : "disabled"} onclick="learnSkill('${sk}')">Học</button></div>
+    </div>`;
+  }).join("");
+  $("view").innerHTML = `<div class="card"><h2>✨ Kỹ năng</h2>
+    <div class="desc">Mỗi kỹ năng mở khóa khi nhánh tương ứng đạt cấp 3. Chi phí 5.000 xu, học một lần.</div>
+    <div class="grid">${cards}</div></div>`;
+}
+function BRANCH_INFO(sk) {
+  return { green_thumb:{br:"sell_price",lv:3}, quick_hands:{br:"grow_time",lv:3},
+           fertilize:{br:"grow_speed",lv:3}, bulk_discount:{br:"seed_cost",lv:3} }[sk];
+}
+async function learnSkill(sk) {
+  const r = await api("farm/skill.php", { skill: sk });
+  if (r.STATE === "SUCCESS") { toast("Học kỹ năng xong ✨", true); await loadState(); renderHud(); pageSkill(); }
+  else { const m = { PREREQ_NOT_MET:"Chưa đủ cấp nhánh yêu cầu", ALREADY_OWNED:"Đã học kỹ năng này" }; toast(m[r.msg] || r.msg || "Lỗi", false); }
+}
+
+/* ================= Nhân vật ================= */
+const CHAR_AV = 12;
+function charImg(id) { return fim(`avatar_${String(((Number(id)-1) % CHAR_AV) + 1).padStart(2,"0")}.png`); }
+function starLine(star) { return "★".repeat(star) + "☆".repeat(Math.max(0, 9 - star)); }
+function pageChars() {
+  if (!CAT) { $("view").innerHTML = `<div class="card"><div class="desc">⏳ Đang tải…</div></div>`; return; }
+  const cards = Object.entries(CAT).sort((a, b) => Number(a[0]) - Number(b[0])).map(([id, c]) => {
+    const star = Number(c.star);
+    const cost = Number(PRICE[star] ?? 0) || null; // star 9 (thần) không có trong PRICE
+    return `<div class="char-card ${star >= 9 ? "god" : ""}" title="ID ${id}">
+      <div class="ch-em">${charImg(id)}</div>
+      <div class="ch-name">${esc(c.name)}</div>
+      <div class="ch-star">${starLine(star)}</div>
+      <div class="ch-id">ID ${id}</div>
+      ${cost !== null ? `<div class="ch-price">💎 ${Number(cost).toLocaleString("en-US")}</div><button class="btn sm" onclick="buyChar(${id})">Mua</button>` : `<div class="ch-price">—</div>`}
+    </div>`;
+  }).join("");
+  $("view").innerHTML = `<div class="card"><h2>🦸 Nhân vật</h2>
+    <div class="desc">Mua nhân vật game gốc bằng ruby (trả từ ví ruby). Giá theo độ hiếm:
+      <b>1–2★</b> 10 💎 · <b>3★</b> 20 💎 · <b>4★</b> 40 💎 · <b>5★</b> 90 💎 · <b>6★</b> 400 💎 · <b>7★</b> 2.700 💎 · <b>8★</b> 7.000 💎.
+      Sau khi mua, nhân vật được gửi vào <b>hòm thư trong game</b>. Không bán nhân vật thần (9★).</div>
+    <div class="char-grid">${cards}</div></div>`;
+}
+
+async function buyChar(id) {
+  if (!confirm("Mua nhân vật ID " + id + " bằng ruby? Nhân vật sẽ gửi vào hòm thư game.")) return;
+  const r = await api("farm/buy_character.php", { character: id });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã mua " + r.name + " (" + r.star + "★) — gửi vào hòm thư 📨", true);
+    await loadState(); renderHud();
+  } else {
+    const m = { INSUFFICIENT_RUBY:"Không đủ ruby", INVALID_CHARACTER:"Nhân vật không tồn tại",
+                NOT_FOR_SALE:"Nhân vật này không bán" };
+    toast(m[r.msg] || r.msg || "Lỗi", false);
+  }
+}
+
+/* ================= Khởi động ================= */
+async function init() {
+  buildNav();
+  await loadAll();
+  navigate(activeView());
+  renderHud();
+}
+(async () => { await init(); })();
+</script>
+</body>
+</html>

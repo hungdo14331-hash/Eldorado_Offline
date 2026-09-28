@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BUSIDOL Admin Control</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">BUSIDOL <span>Admin</span></div>
+    <button class="nav active" data-view="account">Tài khoản</button>
+    <button class="nav" data-view="currency">Tài nguyên</button>
+    <button class="nav" data-view="character">Nhân vật</button>
+    <button class="nav" data-view="item">Item</button>
+    <button class="nav" data-view="audit">Audit Log</button>
+    <div class="local">LOCAL OWNER ONLY</div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">SERVER ADMINISTRATION</p>
+        <h1>BUSIDOL Control Panel</h1>
+      </div>
+      <div id="serverState" class="state">Chưa kiểm tra kết nối</div>
+    </header>
+
+    <section class="panel">
+      <h2>Tìm tài khoản</h2>
+      <p>Nhập ID / username chính xác trong database.</p>
+      <div class="row">
+        <input id="accountId" placeholder="Ví dụ: HUANDO">
+        <button id="searchBtn">Tìm tài khoản</button>
+      </div>
+      <div id="searchMsg" class="msg"></div>
+    </section>
+
+    <section id="accountView" class="view active">
+      <div class="stats">
+        <div><span>Account</span><strong id="vAccount">—</strong></div>
+        <div><span>Gold</span><strong id="vGold">—</strong></div>
+        <div><span>Ruby</span><strong id="vRuby">—</strong></div>
+        <div><span>BP</span><strong id="vBp">—</strong></div>
+        <div><span>Cloud</span><strong id="vCloud">—</strong></div>
+        <div><span>Essence</span><strong id="vEssence">—</strong></div>
+      </div>
+    </section>
+
+    <section id="currencyView" class="view">
+      <div class="panel">
+        <h2>Gửi tài nguyên</h2>
+        <div class="form2">
+          <label>Loại
+            <select id="currencyType">
+              <option>GOLD</option>
+              <option>RUBY</option>
+              <option>BP</option>
+              <option>CLOUD</option>
+              <option>ESSENCE</option>
+            </select>
+          </label>
+          <label>Số lượng
+            <input id="currencyAmount" type="number" min="1" step="1" placeholder="5000">
+          </label>
+        </div>
+        <button id="grantCurrencyBtn">Gửi tài nguyên</button>
+        <div id="currencyMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section id="characterView" class="view">
+      <div class="panel">
+        <h2>Gửi nhân vật qua Mailbox</h2>
+        <div class="form2">
+          <label>Character ID
+            <input id="characterId" type="number" min="1" step="1" placeholder="114">
+          </label>
+          <label>Tiêu đề mail
+            <input id="characterReason" value="ADMIN GIFT">
+          </label>
+        </div>
+        <button id="grantCharacterBtn">Gửi nhân vật</button>
+        <div id="characterMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section id="itemView" class="view">
+      <div class="panel">
+        <h2>Gửi Item</h2>
+        <p>Chỉ dùng khi backend đã xác minh đúng item serialization/mail flow.</p>
+        <div class="form2">
+          <label>Item ID
+            <input id="itemId" type="number" min="1" step="1" placeholder="42">
+          </label>
+          <label>Số lượng
+            <input id="itemQty" type="number" min="1" max="99" value="1">
+          </label>
+        </div>
+        <button id="grantItemBtn">Gửi Item</button>
+        <div id="itemMsg" class="msg"></div>
+      </div>
+    </section>
+
+    <section id="auditView" class="view">
+      <div class="panel">
+        <div class="between">
+          <h2>Audit Log</h2>
+          <button id="auditBtn" class="secondary">Làm mới</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Thời gian</th><th>Target</th><th>Action</th><th>Chi tiết</th><th>Kết quả</th></tr></thead>
+            <tbody id="auditBody"><tr><td colspan="5">Chưa tải dữ liệu.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="confirmBox">
+  <div class="confirm">
+    <h3>Xác nhận</h3>
+    <p id="confirmText"></p>
+    <div class="actions">
+      <button id="cancelConfirm" class="secondary">Hủy</button>
+      <button id="okConfirm">Xác nhận</button>
+    </div>
+  </div>
+</dialog>
+
+<script src="admin.js"></script>
+</body>
+</html>

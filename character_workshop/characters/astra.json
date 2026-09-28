@@ -1,0 +1,55 @@
+{
+  "id": 115,
+  "name": "ASTRA",
+  "filename": "ally_115",
+  "star": 6,
+  "feature": "ATTACK",
+  "attackType": "SINGLE",
+  "size": {
+    "width": 256,
+    "height": 256
+  },
+  "fireSize": {
+    "width": 128,
+    "height": 128
+  },
+  "frames": {
+    "wait": 4,
+    "move": 4,
+    "attack": 4,
+    "beattack": 4,
+    "fire": 4
+  },
+  "combat": {
+    "attackFireFrame": 3,
+    "attackLength": 350,
+    "moveSpeed": 5,
+    "attackSpeed": 25
+  },
+  "stats": {
+    "apStart": 220,
+    "apEnd": 4200,
+    "hpStart": 900,
+    "hpEnd": 18000,
+    "mineralStart": 900,
+    "mineralEnd": 1400,
+    "maxLevel": 70
+  },
+  "layout": {
+    "centerX": 128,
+    "centerY": 180,
+    "centerGapX": 0,
+    "centerGapY": 0,
+    "beattackMargin": 0,
+    "gagebarX": 90,
+    "gagebarY": 78,
+    "fireLengthMargin": 0
+  },
+  "specialAbilities": [
+    "PUSH"
+  ],
+  "innateAbilities": [],
+  "skillParameters": {
+    "push_per": 30
+  }
+}

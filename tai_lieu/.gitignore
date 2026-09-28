@@ -1,0 +1,44 @@
+# logs / runtime
+*.log
+*.err
+*.out
+console.txt
+serve.py.restart_check.py
+
+# temp diagnostic scripts
+_*.py
+_*.txt
+_*.json
+_*.js
+_*.bat
+_*.out
+_*.err
+
+# backups / snapshots
+*.bak
+*.bak_*
+*_OLD_*
+archive/
+backup_*/
+BACKUP_*/
+TRAI_TAIKHOAN_CU_GIU_LAI/
+ACCT_*/
+_SNAP_*/
+_SNAPSHOT_*/
+
+# captures
+capture/
+_capture/
+capture_*/
+CAPTURE_*/
+
+# python
+__pycache__/
+*.pyc
+busidol.db
+busidol.db-journal
+
+# windows / misc
+Desktop.ini
+Thumbs.db
+"ChatGPT Image *.png"

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ed">
+  <title>Moss & Moon — The little farm</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="seed-layout.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#farm" aria-label="Moss and Moon home">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span class="brand-copy"><strong>Moss <i>&</i> Moon</strong><small>YOUR LITTLE PATCH OF EARTH</small></span>
+      </a>
+      <div class="season-pill"><span class="season-icon">✿</span><span><strong>Spring, day <b id="day-number">01</b></strong><small id="season-label">The first thaw</small></span></div>
+      <div class="wallet" aria-label="Wallet">
+        <div class="wallet-item gold"><span class="currency-icon">◉</span><span><small>GOLD</small><strong id="gold-count">0</strong></span><button class="wallet-plus" data-open-tab="shop" aria-label="Get gold">+</button></div>
+        <div class="wallet-item ruby"><span class="currency-icon">◆</span><span><small id="ruby-wallet-label">LOGIN</small><strong id="ruby-count">…</strong></span></div>
+        <div class="wallet-item diamond"><span class="currency-icon">✦</span><span><small>DIAMOND</small><strong id="diamond-count">0</strong></span></div>
+      </div>
+      <button class="sound-button" id="sound-button" title="Toggle ambient sound" aria-label="Toggle ambient sound"><span>♫</span></button>
+    </header>
+
+    <main class="game-layout">
+      <nav class="rail" aria-label="Main navigation">
+        <button class="rail-button active" data-tab="farm" aria-label="Farm" title="Farm"><span>⌂</span><small>Farm</small></button>
+        <button class="rail-button" data-tab="storage" aria-label="Storage" title="Storage"><span>▤</span><small>Storage</small><i id="storage-dot" class="nav-dot hidden"></i></button>
+        <button class="rail-button" data-tab="shop" aria-label="Market" title="Market"><span>♧</span><small>Market</small></button>
+        <button class="rail-button" data-tab="skills" aria-label="Skills" title="Skills"><span>✧</span><small>Skills</small></button>
+        <div class="rail-spacer"></div>
+        <button class="rail-button quiet" id="help-button" aria-label="How to play" title="How to play"><span>?</span><small>Guide</small></button>
+        <div class="avatar" aria-label="Farmer avatar">🌱</div>
+      </nav>
+
+      <section class="farm-column" aria-label="Farm view">
+        <div class="farm-heading">
+          <div><div class="eyebrow"><span class="live-dot"></span> YOUR HOMESTEAD</div><h1>Fernhollow Farm</h1></div>
+          <div class="farm-heading-right"><div class="weather"><span id="weather-icon">☀</span><span><strong id="weather-name">Mild & sunny</strong><small>Perfect growing weather</small></span></div><button class="icon-button" id="zoom-button" aria-label="Toggle farm view" title="Toggle farm view">⤢</button></div>
+        </div>
+        <div class="world-frame" id="world-frame">
+          <div class="world-sky"></div>
+          <div class="world-hud"><span class="hud-chip"><span>☼</span> <b id="clock-label">08:00</b></span><span class="hud-chip plot-chip"><span class="mini-sprout">♧</span> <b id="plot-count">9</b> / 50 plots</span></div>
+          <canvas id="farm-canvas" aria-label="Isometric farm plots. Click an empty plot to plant, or a ripe crop to harvest." role="img"></canvas>
+          <div class="world-tip" id="world-tip"><span class="tip-sparkle">✦</span><span id="tip-text">Pick a seed, then tap an empty patch to plant</span><button id="tip-dismiss" aria-label="Dismiss tip">×</button></div>
+          <div class="world-bottom"><span>✽ &nbsp;Fernhollow valley <i>·</i> little blue creek</span><span class="online-indicator"><i></i> A good day to grow</span></div>
+        </div>
+        <div class="farm-footer">
+          <div class="seed-picker"><div class="seed-label">PLANTING WITH</div><div class="seed-options" id="seed-options"></div></div>
+          <div class="quick-actions"><button class="action-button harvest-action" id="harvest-all-button"><span>✦</span> Gather all <b id="ready-count">0</b></button><button class="action-button" id="unlock-plot-button"><span>＋</span> New patch <b id="plot-price">120</b> <i>◉</i></button></div>
+        </div>
+      </section>
+
+      <aside class="side-panel" aria-label="Farm management">
+        <div class="panel-tabs" role="tablist" aria-label="Farm management tabs"><button class="panel-tab active" data-tab="farm" role="tab">Overview</button><button class="panel-tab" data-tab="storage" role="tab">Storage <span id="storage-tab-count">0</span></button><button class="panel-tab" data-tab="shop" role="tab">Market</button><button class="panel-tab" data-tab="skills" role="tab">Skills</button></div>
+        <div class="panel-content" id="panel-content"></div>
+        <div class="panel-bottom"><span class="save-status"><i></i> All tucked away</span><a class="return-to-ruby" href="../rubyfarm.html"><span aria-hidden="true">↩</span><span>Back to RubyFarm</span></a><button class="reset-link" id="reset-button">Start a new farm</button></div>
+      </aside>
+    </main>
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+    <div class="modal-backdrop hidden" id="modal-backdrop" role="presentation"><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" id="modal-close" aria-label="Close">×</button><div id="modal-content"></div></section></div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

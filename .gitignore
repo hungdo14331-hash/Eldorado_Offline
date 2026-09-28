@@ -1,0 +1,113 @@
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+
+# ==============================
+# Runtime logs / temp
+# ==============================
+*.log
+*.tmp
+*.temp
+
+# ==============================
+# Captures / test artifacts
+# ==============================
+capture/
+capture_*/
+_capture/
+
+_REG_TEST/capture/
+M0_TEST_20260924/capture/
+tai_lieu/capture/
+
+# ==============================
+# Real/local databases
+# ==============================
+busidol.db
+busidol_banbe.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# ==============================
+# Real/local saves
+# ==============================
+offline_save.json
+offline_save*.json*
+save_*.json
+
+# ==============================
+# Local test/runtime artifacts
+# ==============================
+M0_TEST_20260924/
+_pvp_patch_work/
+
+# ==============================
+# Backup files generated during work
+# ==============================
+*.bak
+*.bak_*
+*.M0_BACKUP_*
+
+# ==============================
+# Large/local backup directories
+# ==============================
+ACCT_BACKUP_*/
+ACCT_NEW_*/
+BACKUP_*/
+TRAI_TAIKHOAN_CU_GIU_LAI/
+
+# ==============================
+# Local archives
+# ==============================
+archive/
+
+# ==============================
+# OS / IDE
+# ==============================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+offline_save.json
+offline_save*.json*
+save_*.json
+busidol.db
+busidol_banbe.db
+*.db
+# Local baseline / test snapshots
+M0_BASELINE_20260924_014351/
+M1_TEST_20260924/
+_REG_TEST/
+
+# Local runtime / data variants
+offline_save.boss.json
+memory/
+
+# Patch / backup artifacts
+*.Q_PATCHED_BACKUP_*
+*.M0_BACKUP_*
+*.bak
+*.bak_*
+
+# Local tools / archives
+cloudflared.exe
+*.exe
+*.zip
+tai_lieu.zip
+git_status.txt
+"serve - Copy.py"
+
+# Account/private working copies and generated design captures
+_ACCOUNT_BACKUPS/
+_TEMP_*/
+RAC_FILE/
+.dol_account_active.txt
+*.preserve
+.venv/
+
+# Scratch / temporary local files
+inspect3.py
+tao_huando.py

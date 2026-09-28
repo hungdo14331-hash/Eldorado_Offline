@@ -1,0 +1,117 @@
+
+/* =========================================================
+   BUSIDOL WIKI - Missile / Tower extension
+   Dán phần này vào CUỐI css/style.css
+========================================================= */
+
+.wiki-view {
+    display: none;
+}
+
+.wiki-view.active {
+    display: block;
+}
+
+.main-nav {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.nav-button {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.04);
+    color: inherit;
+    border-radius: 12px;
+    padding: 12px 14px;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+}
+
+.nav-button:hover,
+.nav-button.active {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.sidebar-info {
+    display: grid;
+    gap: 10px;
+    margin-top: 28px;
+}
+
+.sidebar-info > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+.system-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin: 24px 0;
+}
+
+.system-card {
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    padding: 18px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.system-card span {
+    display: block;
+    font-size: 12px;
+    opacity: 0.65;
+    margin-bottom: 8px;
+}
+
+.system-card strong {
+    font-size: 18px;
+}
+
+.table-toolbar {
+    margin: 20px 0;
+}
+
+.data-table-wrapper,
+.detail-table-wrap {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table th,
+.data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: left;
+}
+
+.data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+@media (max-width: 900px) {
+
+    .system-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+
+    .system-summary {
+        grid-template-columns: 1fr;
+    }
+}

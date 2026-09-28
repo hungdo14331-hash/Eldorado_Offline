@@ -1,0 +1,1 @@
+https://game.busidol.com/ELDORADO_WEB/javascript_min/aes.js?13|https://api.paymentwall.com/js/pwsmart/ver/pwsmart.1.3.js?13|https://game.busidol.com/ELDORADO_WEB/GoogleAnalytics/google_analytics.js?13|https://game.busidol.com/ELDORADO_WEB/javascript_leveling/define_glo_20241205.js?13|https://game.busidol.com/ELDORADO_WEB/javascript_min/eldorado_all_20260915.min.js?13

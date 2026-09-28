@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RubyFarm · Kiếm Ruby</title>
+<style>
+  :root {
+    /* Nền & khung */
+    --bg:#0b0d14;
+    --panel:linear-gradient(180deg,rgba(21,26,39,.96),rgba(14,18,30,.98));
+    --panel2:linear-gradient(180deg,rgba(28,36,53,.94),rgba(17,22,36,.98));
+    --panel3:#1c2435;
+    --line:rgba(162,183,228,.16);
+    --line-gold:rgba(224,184,90,.34);
+    /* Màu định danh */
+    --accent:#8b7cff; --accent2:#6bd8e6;
+    --gold:#e0b85a; --gold2:#f6d78a; --gold-ink:#3a2600;
+    --ruby:#e54b72; --ruby2:#ff7092; --violet:#8b7cff;
+    --mint:#7ce2c1; --txt:#f5f7fb; --dim:#9daac0; --ok:#7ce2c1; --err:#e0605f;
+    /* Bo góc & bóng */
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
+    --sh1:0 2px 8px rgba(0,0,0,.3);
+    --sh2:0 8px 22px rgba(0,0,0,.38);
+    --sh3:0 14px 34px rgba(0,0,0,.5);
+    /* Cỡ chữ */
+    --fs-cap:11px; --fs-sm:12px; --fs-body:13.5px; --fs-card:15px; --fs-h2:18px;
+    --fs-h1:clamp(24px,2.6vw,34px);
+    --sbw:252px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  button, input, select, textarea { font-family:inherit; }
+  html,body { height:100%; }
+  body {
+    background:var(--bg); color:var(--txt);
+    font:14px/1.5 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    background-image:linear-gradient(rgba(6,10,20,.86),rgba(5,8,16,.96)),url("image/ui/1_mainmenu/mm_bg.jpg");
+    background-size:cover; background-position:center; background-attachment:fixed;
+  }
+  :focus-visible { outline:2px solid var(--accent2); outline-offset:2px; border-radius:6px; }
+  .app { display:flex; min-height:100vh; }
+
+  /* ---------- Sidebar ---------- */
+  .side {
+    width:var(--sbw); flex:none; position:sticky; top:0; height:100vh;
+    background:linear-gradient(180deg,#0e1729 0%,#0a1120 55%,#080e1b 100%);
+    border-right:1px solid var(--line-gold); display:flex; flex-direction:column;
+    padding:16px 12px 12px; z-index:5;
+  }
+  .brand { position:relative; text-align:center; padding:14px 8px 12px; margin-bottom:12px;
+           border:1px solid var(--line); border-radius:var(--r-md);
+           background:radial-gradient(120% 90% at 50% 0%,rgba(232,193,90,.14),rgba(232,193,90,0) 62%),
+                      linear-gradient(180deg,rgba(21,31,50,.9),rgba(11,17,30,.9));
+           box-shadow:var(--sh1); }
+  .brand img { width:148px; filter:drop-shadow(0 2px 8px rgba(0,0,0,.6)); }
+  .brand .tag { display:inline-block; margin-top:8px; font-size:var(--fs-cap); letter-spacing:2px; color:var(--gold);
+                border:1px solid var(--line-gold); padding:2px 10px; border-radius:20px;
+                background:rgba(232,193,90,.08); }
+  .nav { flex:1; overflow-y:auto; padding-right:4px; scrollbar-width:thin;
+         scrollbar-color:rgba(139,165,215,.3) transparent; }
+  .nav::-webkit-scrollbar { width:8px; }
+  .nav::-webkit-scrollbar-thumb { background:rgba(139,165,215,.26); border-radius:8px; }
+  .nav::-webkit-scrollbar-thumb:hover { background:rgba(139,165,215,.42); }
+  .nav .grp { position:relative; font-size:10px; letter-spacing:2px; color:var(--gold);
+              text-transform:uppercase; margin:16px 8px 8px; padding-bottom:6px; }
+  .nav .grp::after { content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
+                     background:linear-gradient(90deg,var(--line-gold),rgba(232,193,90,0)); }
+  .nav .grp:first-child { margin-top:2px; }
+  .nav button, .nav a {
+    display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    background:transparent; border:1px solid transparent; color:var(--txt);
+    padding:9px 11px; border-radius:var(--r-md); cursor:pointer; font-size:var(--fs-body); font-weight:600;
+    transition:background .15s, border-color .15s, color .15s; margin-bottom:3px; text-decoration:none;
+  }
+  .nav button .ic, .nav a .ic { width:27px; height:27px; flex:none; display:flex; align-items:center; justify-content:center;
+                    background:rgba(255,255,255,.06); border:1px solid var(--line);
+                    border-radius:var(--r-sm); font-size:15px; }
+  .nav button:hover, .nav a:hover { background:rgba(255,255,255,.05); border-color:var(--line); }
+  .nav button:hover .ic, .nav a:hover .ic { background:rgba(255,255,255,.1); }
+  .nav button.on { background:linear-gradient(90deg,rgba(232,193,90,.16),rgba(232,193,90,.03) 70%,transparent);
+                   border-color:var(--line-gold); color:#fff; box-shadow:inset 3px 0 0 var(--gold); }
+  .nav button.on .ic { background:rgba(232,193,90,.28); border-color:var(--line-gold); }
+  .nav .rwd { margin-left:auto; font-size:10px; font-weight:700; color:var(--gold);
+              background:rgba(232,193,90,.1); border:1px solid var(--line-gold);
+              padding:1px 7px; border-radius:20px; white-space:nowrap; }
+  .side-foot { margin-top:10px; padding:10px; border:1px solid var(--line); border-radius:var(--r-md);
+               background:linear-gradient(180deg,rgba(19,28,46,.85),rgba(10,16,28,.9)); }
+  .side-foot .srow { display:flex; align-items:center; gap:8px; font-size:var(--fs-sm); color:var(--dim); }
+  .side-foot .srow + .srow { margin-top:6px; }
+  .side-foot .srow .slab { flex:1; min-width:0; }
+  .side-foot b { color:var(--gold); font-size:var(--fs-body); font-variant-numeric:tabular-nums; }
+
+  /* ---------- Main ---------- */
+  .main { flex:1; min-width:0; padding:0 22px 40px; }
+  .hud { position:sticky; top:0; z-index:4; display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+         padding:10px 22px 12px; margin:0 -22px;
+         background:linear-gradient(180deg,rgba(6,10,20,.97) 0%,rgba(6,10,20,.86) 68%,rgba(6,10,20,0) 100%); }
+  .hud-search { display:flex; align-items:center; gap:8px; flex:1 1 220px; max-width:300px; padding:8px 12px;
+                border:1px solid var(--line); border-radius:var(--r-md); background:rgba(8,12,22,.72);
+                color:var(--dim); cursor:pointer; font:inherit; text-align:left; transition:border-color .15s, color .15s, background .15s; }
+  .hud-search:hover { border-color:rgba(229,75,114,.52); background:rgba(229,75,114,.08); color:var(--txt); }
+  .hud-search .search-mark { color:var(--ruby2); font-size:17px; line-height:1; }
+  .hud-search span:nth-child(2) { flex:1; }
+  .hud-search kbd { border:1px solid var(--line); border-radius:6px; padding:1px 6px; color:var(--dim); font-size:10px; line-height:1.35; }
+  .hud-res { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .res { display:flex; align-items:center; gap:6px; padding:4px 10px 4px 5px;
+         background:var(--panel); border:1px solid var(--line); border-radius:var(--r-md);
+         box-shadow:var(--sh1); transition:border-color .15s, background .15s; }
+  .res:hover { border-color:rgba(139,165,215,.36); }
+  .res img { height:22px; width:auto; }
+  .res b { font-size:var(--fs-body); font-variant-numeric:tabular-nums; color:var(--txt); }
+  .res.gold b    { color:var(--gold); }
+  .res.ruby b    { color:var(--ruby); }
+  .res.bp b      { color:var(--accent); }
+  .res.cloud b   { color:var(--accent2); }
+  .res.essence b { color:var(--violet); }
+  .res.tk { color:var(--gold); gap:8px; }
+  .res.tk span { font-size:var(--fs-sm); font-variant-numeric:tabular-nums; }
+  .wallet-chip { display:flex; align-items:center; gap:10px; padding:5px 14px 5px 6px; cursor:pointer;
+                 font:inherit; text-align:left; color:var(--txt);
+                 background:linear-gradient(90deg,rgba(232,193,90,.2),rgba(232,193,90,.05) 62%,rgba(255,255,255,.03));
+                 border:1px solid var(--line-gold); border-radius:var(--r-md);
+                 box-shadow:0 3px 14px rgba(232,193,90,.14); transition:filter .15s; }
+  .wallet-chip:hover { filter:brightness(1.12); }
+  .wallet-chip .wl-ic { width:31px; height:31px; flex:none; display:flex; align-items:center; justify-content:center;
+                        border-radius:var(--r-sm); background:rgba(232,193,90,.16);
+                        border:1px solid var(--line-gold); font-size:16px; }
+  .wallet-chip .wl-tx { display:flex; flex-direction:column; line-height:1.15; }
+  .wallet-chip .wl-tx .lab { font-size:10px; letter-spacing:1.2px; text-transform:uppercase; color:var(--gold); }
+  .wallet-chip .wl-tx b { font-size:17px; color:var(--gold2); font-variant-numeric:tabular-nums; }
+  .wallet-chip .wl-tx .cap { font-size:var(--fs-cap); color:var(--dim); }
+  .warn-chip { display:flex; align-items:center; gap:8px; padding:7px 14px; cursor:pointer; font:inherit;
+               font-size:var(--fs-sm); font-weight:700; color:#ffd9d8;
+               background:linear-gradient(90deg,rgba(224,96,95,.26),rgba(224,96,95,.08));
+               border:1px solid rgba(224,96,95,.55); border-radius:var(--r-md); transition:filter .15s; }
+  .warn-chip:hover { filter:brightness(1.14); }
+  .load-chip { display:flex; align-items:center; gap:8px; padding:7px 14px; font-size:var(--fs-sm);
+               color:var(--dim); background:rgba(255,255,255,.03);
+               border:1px dashed var(--line); border-radius:var(--r-md); }
+  .back-chip { display:flex; align-items:center; gap:8px; margin-left:auto; padding:8px 16px; flex:none;
+               font-size:var(--fs-body); font-weight:700; color:#fff; text-decoration:none;
+               background:linear-gradient(180deg,rgba(229,75,114,.96),rgba(176,48,87,.96)); border:1px solid rgba(255,142,167,.7);
+               border-radius:var(--r-md); box-shadow:0 3px 12px rgba(229,75,114,.28); transition:filter .15s; }
+  .back-chip:hover { filter:brightness(1.13); }
+  .back-chip .back-mark { color:#fff; font-size:16px; line-height:1; }
+
+  /* ---------- Sprite Style Anchor v1: khung chứa (kích thước do ui_atlas.css cấp) ---------- */
+  .sp-btn-chip { position:relative; padding:0; border:0; background:none; box-shadow:none; flex:none; }
+  .sp-btn-chip .bc-lb { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                        gap:6px; font-size:var(--fs-body); font-weight:700; color:#fff; line-height:1.1;
+                        text-shadow:0 1px 3px rgba(0,0,0,.7); }
+  .res.tk .tk-i { display:inline-flex; align-items:center; gap:5px; }
+  .res.tk .tk-i .tk-n { font-size:var(--fs-sm); color:var(--gold); font-variant-numeric:tabular-nums; }
+  .gcard .g-banner { display:block; width:100%; height:auto; }
+  .gcard .g-art { display:block; width:100%; height:118px; object-fit:cover; border-radius:12px;
+                  border:1px solid rgba(162,183,228,.2); box-shadow:0 8px 20px rgba(0,0,0,.22); }
+  .discovery-head { display:flex; align-items:flex-end; justify-content:space-between; gap:18px; flex-wrap:wrap; margin-bottom:16px; }
+  .discovery-copy { min-width:220px; flex:1 1 360px; }
+  .discovery-tools { display:flex; align-items:center; gap:8px; flex:1 1 420px; justify-content:flex-end; flex-wrap:wrap; }
+  .game-search { display:flex; align-items:center; gap:8px; min-width:min(100%,260px); flex:1 1 260px;
+                 padding:9px 12px; border:1px solid var(--line); border-radius:12px; background:rgba(8,12,22,.66); }
+  .game-search .search-mark { color:var(--ruby2); font-size:17px; }
+  .game-search input { min-width:0; width:100%; border:0; outline:0; color:var(--txt); background:transparent; font-size:var(--fs-body); }
+  .game-search input::placeholder { color:var(--dim); }
+  .filter-tabs { display:flex; gap:6px; flex-wrap:wrap; }
+  .filter-tab { border:1px solid var(--line); border-radius:999px; padding:8px 12px; color:var(--dim);
+                background:rgba(255,255,255,.03); cursor:pointer; font-size:var(--fs-sm); font-weight:700; }
+  .filter-tab:hover { border-color:rgba(229,75,114,.5); color:var(--txt); }
+  .filter-tab.on { color:#fff; background:linear-gradient(180deg,var(--ruby2),var(--ruby)); border-color:rgba(255,142,167,.7);
+                  box-shadow:0 4px 14px rgba(229,75,114,.25); }
+
+  /* ---------- Yêu cầu vé trước khi vào game ---------- */
+  .req { display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:var(--fs-body);
+         background:linear-gradient(90deg,rgba(91,141,239,.14),rgba(11,17,30,.82) 62%);
+         border:1px solid var(--line); border-left:3px solid var(--accent);
+         border-radius:var(--r-md); padding:10px 13px; margin-bottom:12px; box-shadow:var(--sh1); }
+  .req.ok { border-left-color:var(--ok); background:linear-gradient(90deg,rgba(70,196,122,.14),rgba(11,17,30,.82) 62%); }
+  .req.no { border-left-color:var(--err); background:linear-gradient(90deg,rgba(224,96,95,.15),rgba(11,17,30,.82) 62%); }
+  .req a { color:var(--accent2); text-decoration:underline; text-underline-offset:2px; }
+
+  /* ---------- Khung game nhúng ---------- */
+  .embframe { display:block; width:100%; height:780px; border:0; border-radius:var(--r-lg);
+              background:#0b1120; box-shadow:var(--sh2); }
+
+  .view { margin-top:18px; animation:fade .25s ease; }
+  @keyframes fade { from{opacity:0; transform:translateY(6px);} to{opacity:1;} }
+  @media (prefers-reduced-motion:reduce){ .view { animation:none; } }
+
+  .card { background:var(--panel2); border:1px solid var(--line); border-radius:var(--r-lg); padding:18px;
+          box-shadow:var(--sh2); }
+  .card h2 { font-size:var(--fs-h2); margin-bottom:4px; display:flex; align-items:center; gap:10px;
+             color:#fff; letter-spacing:.2px; }
+  .card h2 .hb { font-size:20px; }
+  .card .desc { color:var(--dim); font-size:var(--fs-body); margin-bottom:14px; }
+  .card.inner { background:linear-gradient(180deg,rgba(16,24,40,.74),rgba(9,14,26,.8));
+                border-radius:var(--r-md); padding:14px; box-shadow:none; }
+
+  /* ---------- Home ---------- */
+  .hero { position:relative; overflow:hidden; border:1px solid var(--line-gold); border-radius:var(--r-xl);
+          min-height:250px; display:flex; flex-direction:column; justify-content:flex-end; padding:28px;
+          background:linear-gradient(105deg,rgba(6,10,20,.93) 0%,rgba(6,10,20,.6) 54%,rgba(6,10,20,.34) 100%),
+                     radial-gradient(90% 120% at 88% 12%,rgba(232,193,90,.2),rgba(6,10,20,0) 58%),
+                     url("assets/rubyfarm/rubyfarm_hero_garden.png");
+          background-size:cover; background-position:center;
+          box-shadow:var(--sh3); }
+  .hero::before { content:""; position:absolute; left:0; right:0; top:0; height:2px; pointer-events:none;
+                  background:linear-gradient(90deg,rgba(232,193,90,0),rgba(232,193,90,.8),rgba(232,193,90,0)); }
+  .hero::after { content:""; position:absolute; inset:0; pointer-events:none;
+                 background:radial-gradient(120% 110% at 50% 130%,rgba(4,7,14,.92),rgba(4,7,14,0) 60%); }
+  .hero > * { position:relative; z-index:1; }
+  .hero .eyebrow { font-size:var(--fs-cap); letter-spacing:2.4px; text-transform:uppercase;
+                   color:var(--gold); margin-bottom:6px; }
+  .hero h1 { font-size:var(--fs-h1); line-height:1.15; letter-spacing:.4px;
+             text-shadow:0 2px 14px rgba(0,0,0,.85); }
+  .hero h1 em { font-style:normal; color:var(--gold2); }
+  .hero p { color:#cfdaee; max-width:640px; margin-top:8px; font-size:var(--fs-body);
+            text-shadow:0 1px 8px rgba(0,0,0,.85); }
+  .hero .act { margin-top:16px; display:flex; gap:10px; flex-wrap:wrap; }
+
+  .btn { background:linear-gradient(180deg,#6f9bff,#4a76d8); border:1px solid rgba(150,182,255,.45);
+         border-radius:var(--r-md); color:#fff; padding:10px 20px; font:inherit; font-size:var(--fs-body);
+         font-weight:700; cursor:pointer; box-shadow:0 3px 12px rgba(74,118,216,.35);
+         transition:filter .15s, transform .12s; }
+  .btn:hover { filter:brightness(1.12); }
+  .btn:active { transform:translateY(1px); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; filter:none; transform:none; box-shadow:none; }
+  .btn.lg { padding:12px 24px; font-size:var(--fs-card); border-radius:14px; }
+  .btn.ghost { background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+               border-color:var(--line); box-shadow:none; }
+  .btn.ghost:hover { border-color:rgba(139,165,215,.42); background:rgba(255,255,255,.13); }
+  .btn.gold { background:linear-gradient(180deg,var(--gold2),#d9a63d); color:var(--gold-ink);
+              border-color:rgba(255,236,182,.7); box-shadow:0 4px 16px rgba(217,166,61,.4); }
+
+  .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(248px,1fr)); gap:14px; }
+  .gcard { position:relative; display:flex; flex-direction:column; gap:10px; text-align:left; font:inherit;
+           color:var(--txt); background:var(--panel2); border:1px solid var(--line);
+           border-radius:var(--r-lg); padding:16px; cursor:pointer; box-shadow:var(--sh1);
+           transition:transform .16s ease, border-color .16s ease, box-shadow .16s ease; }
+  .gcard:hover { transform:translateY(-3px); border-color:var(--line-gold); box-shadow:var(--sh3); }
+  .gcard:active { transform:translateY(-1px); }
+  .gcard .g-top { display:flex; align-items:center; gap:11px; }
+  .gcard .g-ic { width:44px; height:44px; flex:none; display:flex; align-items:center; justify-content:center;
+                 font-size:23px; border-radius:var(--r-md); border:1px solid var(--line);
+                 background:radial-gradient(120% 120% at 50% 0%,rgba(232,193,90,.2),rgba(255,255,255,.03));
+                 transition:border-color .16s, background .16s; }
+  .gcard:hover .g-ic { border-color:var(--line-gold);
+                       background:radial-gradient(120% 120% at 50% 0%,rgba(232,193,90,.3),rgba(255,255,255,.04)); }
+  .gcard .g-name { flex:1; min-width:0; font-size:var(--fs-card); font-weight:700; color:#fff; line-height:1.25; }
+  .gcard .g-kind { flex:none; font-size:10px; font-weight:700; letter-spacing:.6px; text-transform:uppercase;
+                   color:var(--dim); background:rgba(255,255,255,.05); border:1px solid var(--line);
+                   padding:2px 8px; border-radius:20px; white-space:nowrap; }
+  .gcard .g-kind.tk { color:var(--gold); border-color:var(--line-gold); background:rgba(232,193,90,.12); }
+  .gcard .g-desc { flex:1; font-size:var(--fs-sm); color:var(--dim); line-height:1.45; }
+  .gcard .g-meta { display:flex; flex-direction:column; gap:5px; padding-top:10px; border-top:1px solid var(--line); }
+  .gcard .g-mi { display:flex; align-items:baseline; gap:8px; font-size:var(--fs-sm); }
+  .gcard .g-mi i { font-style:normal; flex:none; min-width:76px; color:var(--dim); }
+  .gcard .g-mi b { font-weight:600; color:var(--txt); }
+  .gcard .g-mi b.gold { color:var(--gold); }
+  .gcard .g-foot { display:flex; align-items:center; gap:10px; }
+  .gcard .g-state { font-size:var(--fs-cap); font-weight:700; }
+  .gcard .g-state.ok { color:var(--ok); }
+  .gcard .g-state.no { color:var(--err); }
+  .gcard .play { margin-left:auto; display:inline-flex; align-items:center; gap:6px; white-space:nowrap;
+                 font-size:var(--fs-sm); font-weight:700; color:#fff; padding:6px 14px; border-radius:20px;
+                 background:linear-gradient(180deg,#5b8def,#3f63bd); border:1px solid rgba(150,182,255,.45);
+                 box-shadow:0 2px 10px rgba(74,118,216,.3); transition:filter .16s, transform .16s; }
+  .gcard:hover .play { filter:brightness(1.15); transform:translateX(2px); }
+  .gcard.locked .play { background:linear-gradient(180deg,#5a6478,#434b5c);
+                        border-color:rgba(255,255,255,.14); box-shadow:none; }
+
+  .fee_tbl { margin:0 0 14px; overflow-x:auto; border:1px solid var(--line); border-radius:var(--r-md); }
+  .fee_tbl table { width:100%; border-collapse:collapse; font-size:var(--fs-sm); }
+  .fee_tbl th, .fee_tbl td { text-align:left; padding:8px 11px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  .fee_tbl tr:last-child td { border-bottom:0; }
+  .fee_tbl th { color:var(--gold); background:rgba(232,193,90,.08); text-transform:uppercase;
+                font-size:10px; letter-spacing:1.2px; }
+  .fee_tbl tbody tr:nth-child(even) { background:rgba(255,255,255,.02); }
+  .fee_tbl tr.warn td { color:var(--err); }
+
+  .homeblk { display:grid; grid-template-columns:1fr; gap:16px; margin-top:16px; }
+  @media (min-width:1100px){ .homeblk { grid-template-columns:1.45fr 1fr; } }
+
+  /* ---------- Điểm danh ---------- */
+  .ci_head { display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap; }
+  .ci_grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); gap:8px; }
+  .cid { position:relative; background:linear-gradient(180deg,rgba(16,24,40,.8),rgba(9,14,26,.86));
+         border:1px solid var(--line); border-radius:var(--r-md); padding:10px 6px; text-align:center;
+         transition:border-color .15s, background .15s; }
+  .cid .d { font-size:var(--fs-cap); color:var(--dim); }
+  .cid .rw { font-size:var(--fs-sm); font-weight:700; margin-top:4px; color:var(--txt); }
+  .cid .rw img { height:16px; vertical-align:-3px; margin-right:3px; }
+  .cid .rw .emo { font-size:17px; vertical-align:-2px; margin-right:3px; }
+  .cid.later { opacity:.42; }
+  .cid.today { border-color:var(--line-gold);
+               background:linear-gradient(180deg,rgba(232,193,90,.16),rgba(9,14,26,.86));
+               box-shadow:inset 0 0 0 1px rgba(232,193,90,.22); }
+  .cid.done { border-color:rgba(70,196,122,.5); }
+  .cid.done .d::after { content:" ✓"; color:var(--ok); font-weight:700; }
+  .cid .get { width:100%; margin-top:7px; padding:5px 0; font-size:var(--fs-sm); border-radius:var(--r-sm); }
+  .ci_note { margin-top:12px; font-size:var(--fs-sm); color:var(--dim); line-height:1.5; }
+
+  /* Panel điểm danh (trang chủ + trang điểm danh) */
+  .chk { display:flex; flex-direction:column; gap:12px; }
+  .chk-day { font-size:var(--fs-cap); letter-spacing:1.6px; text-transform:uppercase; color:var(--gold); }
+  .chk-rw { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--line);
+            border-radius:var(--r-md);
+            background:linear-gradient(90deg,rgba(232,193,90,.14),rgba(9,14,26,.72) 66%); }
+  .chk-rw .cr-ic { width:42px; height:42px; flex:none; display:flex; align-items:center; justify-content:center;
+                   font-size:20px; border-radius:var(--r-md); border:1px solid var(--line-gold);
+                   background:rgba(232,193,90,.14); }
+  .chk-rw .cr-ic img { height:26px; width:auto; }
+  .chk-rw .cr-tx { min-width:0; }
+  .chk-rw .cr-tx .v { font-size:22px; font-weight:800; line-height:1.1; color:var(--gold2);
+                      font-variant-numeric:tabular-nums; }
+  .chk-rw .cr-tx .l { font-size:var(--fs-sm); color:var(--dim); }
+  .chk-state { font-size:var(--fs-body); font-weight:700; color:var(--dim); }
+  .chk-state.ok { color:var(--ok); }
+  .chk-state.no { color:var(--err); }
+  .chk-streak { align-self:flex-start; font-size:var(--fs-sm); font-weight:700; color:var(--gold);
+                background:rgba(232,193,90,.12); border:1px solid var(--line-gold);
+                padding:3px 10px; border-radius:20px; }
+  .chk .act { display:flex; gap:10px; flex-wrap:wrap; }
+  .chk-strip { display:flex; gap:6px; flex-wrap:wrap; }
+  .chk-strip .s { flex:1 1 46px; min-width:42px; text-align:center; font-size:10px; color:var(--dim);
+                  padding:6px 2px; border:1px solid var(--line); border-radius:var(--r-sm);
+                  background:rgba(9,14,26,.72); }
+  .chk-strip .s .v { display:block; font-size:var(--fs-sm); font-weight:700; color:var(--txt); margin-top:2px; }
+  .chk-strip .s.done { border-color:rgba(70,196,122,.5); }
+  .chk-strip .s.done .v { color:var(--ok); }
+  .chk-strip .s.today { border-color:var(--line-gold); background:rgba(232,193,90,.14); }
+  .chk-strip .s.today .v { color:var(--gold2); }
+  .chk-strip .s.later { opacity:.5; }
+
+  /* ---------- Khối ví / vé / quy đổi ---------- */
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(148px,1fr)); gap:10px; margin-bottom:14px; }
+  .stat-box { border:1px solid var(--line); border-radius:var(--r-md); padding:10px 12px;
+              background:linear-gradient(180deg,rgba(16,24,40,.74),rgba(9,14,26,.8)); }
+  .stat-box .k { font-size:var(--fs-cap); letter-spacing:1px; text-transform:uppercase; color:var(--dim); }
+  .stat-box .v { margin-top:4px; font-size:19px; font-weight:800; color:var(--txt);
+                 font-variant-numeric:tabular-nums; }
+  .stat-box.gold { border-color:var(--line-gold);
+                   background:linear-gradient(180deg,rgba(232,193,90,.14),rgba(9,14,26,.8)); }
+  .stat-box.gold .v { color:var(--gold2); }
+  .rowline { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:12px; }
+  .rowline .lab { flex:none; font-weight:700; }
+  .inline-ctl { display:flex; align-items:center; gap:8px; }
+  .rate { font-size:var(--fs-sm); color:var(--dim); }
+  .tk-n { font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+  .bals { display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:8px; }
+  .bals .rate { grid-column:1/-1; }
+  .wd-note { margin-top:10px; font-size:var(--fs-sm); color:var(--dim); line-height:1.5; }
+  .sec { margin:16px 0 8px; font-size:var(--fs-card); color:#fff; }
+  .rowline .fill { flex:1 1 auto; min-width:140px; }
+  .center { text-align:center; }
+  .grow.mid { justify-content:center; }
+  .sl_board { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:360px; margin:0 auto;
+              background:rgba(9,14,26,.8); border:1px solid var(--line); padding:8px; border-radius:var(--r-md); }
+  .card.narrow { max-width:620px; }
+  .card.wide { max-width:760px; }
+  .card.inner + .card.inner { margin-top:10px; }
+  .card .desc + .grid { margin-top:12px; }
+  .sec + .wd-note { margin:0 0 10px; }
+  .rowline + .rate { margin-top:6px; }
+  .dim { color:var(--dim); }
+  .arena .tip { position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+                color:var(--dim); text-align:center; padding:20px; }
+
+  /* ---------- Mini game ---------- */
+  .gwrap .arena { position:relative; height:230px; overflow:hidden;
+                  background:linear-gradient(180deg,rgba(12,19,34,.9),rgba(8,13,24,.94));
+                  border:1px solid var(--line); border-radius:var(--r-md); cursor:pointer; }
+  .coin { position:absolute; font-size:28px; cursor:pointer; user-select:none;
+          text-shadow:0 2px 6px rgba(0,0,0,.5); }
+  .grow { display:flex; align-items:center; gap:12px; margin-top:12px; flex-wrap:wrap; }
+  .stat { font-size:14px; font-weight:700; color:var(--gold); font-variant-numeric:tabular-nums; }
+  .gres { min-height:24px; font-size:var(--fs-body); margin-top:10px; color:var(--ok); }
+  input[type=number] { background:rgba(9,14,26,.72); border:1px solid var(--line); color:var(--txt);
+                       border-radius:var(--r-md); padding:9px 12px; width:130px; font-size:15px; }
+  input[type=number]:focus { border-color:var(--accent); }
+  .memgrid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; max-width:420px; }
+  .cardc { background:linear-gradient(180deg,rgba(16,24,40,.9),rgba(9,14,26,.9)); border:1px solid var(--line);
+           border-radius:var(--r-sm); height:56px; display:flex; align-items:center; justify-content:center;
+           font-size:24px; cursor:pointer; user-select:none; transition:transform .1s, border-color .1s; }
+  .cardc.open,.cardc.done { background:linear-gradient(180deg,rgba(46,64,92,.9),rgba(30,44,68,.9)); }
+  .cardc.done { border-color:var(--ok); opacity:.9; cursor:default; }
+  .sim { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:min(260px,100%); margin:0 auto; }
+  .pad { height:80px; border-radius:var(--r-md); cursor:pointer; opacity:.5; border:2px solid rgba(0,0,0,.4);
+         transition:opacity .08s, transform .08s; }
+  .pad.lit { opacity:1; transform:scale(1.04); }
+  .rpsb { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .rpsb .rp { font-size:34px; background:linear-gradient(180deg,rgba(16,24,40,.9),rgba(9,14,26,.9));
+              border:1px solid var(--line); border-radius:var(--r-md); padding:12px 20px; }
+  .wd { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:16px; }
+  .wd .lab { font-weight:700; }
+
+  #toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%); max-width:min(90vw,520px);
+           padding:11px 20px; border-radius:var(--r-md); color:#fff; font-weight:700; font-size:var(--fs-body);
+           opacity:0; transition:opacity .25s; pointer-events:none; z-index:99; box-shadow:var(--sh3); }
+  #toast.ok { background:linear-gradient(180deg,#4fce84,#2f9d5e); }
+  #toast.err { background:linear-gradient(180deg,#e87a79,#c04a49); }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:1240px){
+    :root { --sbw:226px; }
+    .brand img { width:132px; }
+    .main { padding:0 18px 36px; }
+    .hud { margin:0 -18px; padding-left:18px; padding-right:18px; }
+    .hero { min-height:206px; padding:20px; }
+  }
+  @media (max-width:1024px){
+    :root { --sbw:204px; }
+    .nav .rwd { display:none; }
+    .side { padding:12px 10px 10px; }
+    .brand { padding:10px 6px; } .brand img { width:118px; }
+    .nav button { padding:8px 9px; font-size:var(--fs-sm); }
+    .nav button .ic { width:24px; height:24px; font-size:14px; }
+    .grid { grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); }
+    .back-chip { margin-left:0; }
+  }
+  @media (max-width:900px){
+    :root { --sbw:100%; }
+    .app { flex-direction:column; }
+    .side { position:static; height:auto; width:100%; border-right:0;
+            border-bottom:1px solid var(--line-gold); padding:12px; }
+    .brand { display:flex; align-items:center; gap:10px; text-align:left; padding:8px 10px; margin-bottom:10px; }
+    .brand img { width:104px; }
+    .brand .tag { margin-top:0; margin-left:auto; }
+    .nav { display:flex; flex-wrap:wrap; gap:4px; overflow:visible; padding-right:0; }
+    .nav .grp { width:100%; margin:8px 4px 4px; }
+    .nav button { width:auto; flex:1 1 46%; padding:8px 10px; margin-bottom:0; }
+    .side-foot { display:flex; gap:10px; margin-top:8px; }
+    .side-foot .srow { flex:1; justify-content:space-between; }
+    .side-foot .srow + .srow { margin-top:0; }
+    .main { padding:0 14px 30px; }
+    .hud { position:static; margin:0 -14px; padding:10px 14px 12px; gap:8px; }
+    .res { padding:3px 8px 3px 4px; } .res img { height:18px; }
+    .res b { font-size:var(--fs-sm); }
+    .res.tk span { font-size:var(--fs-cap); }
+    .wallet-chip { padding:4px 10px 4px 5px; }
+    .wallet-chip .wl-ic { width:27px; height:27px; font-size:14px; }
+    .wallet-chip .wl-tx b { font-size:15px; }
+    .hud-search { order:-1; flex:1 1 100%; max-width:none; }
+    .back-chip { margin-left:0; }
+    .hero { min-height:190px; padding:18px; }
+    .hero .act .btn { flex:1 1 auto; text-align:center; }
+    .embframe { height:80vh; min-height:560px; }
+    .card { padding:14px; }
+    .grid { grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); }
+    .chk-strip .s { min-width:34px; }
+  }
+  @media (max-width:640px){
+    .grid { grid-template-columns:1fr; }
+    .nav button { flex:1 1 100%; }
+    .hero { min-height:174px; padding:16px; }
+    .hero h1 { font-size:22px; }
+    .back-chip { flex:1 1 100%; justify-content:center; }
+    .ci_grid { grid-template-columns:repeat(auto-fill,minmax(72px,1fr)); }
+    .stat-grid { grid-template-columns:repeat(auto-fill,minmax(122px,1fr)); }
+    .card h2 { font-size:var(--fs-card); }
+  }
+</style>
+<link rel="stylesheet" href="assets/ui/ui_atlas.css">
+</head>
+<body>
+
+  <div class="app">
+    <aside class="side">
+      <div class="brand">
+        <img src="image/bg/introLogo_en.png" alt="Eldorado">
+        <span class="tag">RUBY · FARM</span>
+      </div>
+      <nav class="nav" id="nav"></nav>
+      <div class="side-foot">
+        <div class="srow"><span class="slab">Ví ruby</span><b id="side_wallet">0</b></div>
+        <div class="srow"><span class="slab">Hạn mức/ngày</span><b id="side_cap">0</b></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="hud" id="hud"></header>
+      <section class="view" id="view"></section>
+    </main>
+  </div>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const fmt = n => Number(n||0).toLocaleString("en-US");
+const short = n => { n = Number(n); if (n >= 1e6) return Math.round(n/1e6) + "M";
+                     if (n >= 1e3) return Math.round(n/1e3) + "K"; return String(n); };
+
+/* ================= API ================= */
+async function api(path, data) {
+  const b = new URLSearchParams();
+  for (const k of Object.keys(data)) b.append(k, data[k]);
+  let res;
+  try { res = await fetch(path, { method:"POST", body:b.toString() }); }
+  catch(e) { return { STATE:"ERROR", msg:"network" }; }
+  try { return await res.json(); } catch(e) { return { STATE:"ERROR" }; }
+}
+
+/* ================= Store ================= */
+let W = null;      // wallet state (from mywallet.php)
+let CI = null;     // checkin state (from checkin.php)
+let CONN = true;   // false khi không gọi được máy chủ (fetch lỗi)
+const cdEnd = {};  // game id -> cooldown end timestamp (server-driven)
+let currentGame = null; // active embedded game id (iframe award bridge)
+let homeFilter = "all";
+let homeQuery = "";
+
+const BACK_URL = "source_20240722/index__mobile.html#sign=offline&time=0";
+const cdSec = () => (W && Number(W.cd)) || 3;   // cooldown do server khai báo
+const capRuby = () => (W && Number(W.cap)) || 0;
+
+const RES_META = {
+  gold:    { img:"image/ui/0_common/co_goldbar.png",      name:"Vàng" },
+  ruby:    { img:"image/ui/0_common/co_rubybar.png",      name:"Ruby" },
+  bp:      { img:"image/ui/0_common/co_bpbar.png",        name:"BP" },
+  cloud:   { img:"image/ui/0_common/co_cloudbar.png",     name:"Mảnh mây" },
+  essence: { img:"assets/rubyfarm/rubyfarm_essence_icon.png", name:"Essence" },
+};
+const RES_IMG = {};
+for (const _k of Object.keys(RES_META)) RES_IMG[_k] = RES_META[_k].img;
+/* Sprite thay ảnh cho 4 ô HUD; riêng essence giữ PNG cũ của prototype. */
+const RES_SP = { gold:"sp-res-gold", ruby:"sp-res-ruby", bp:"sp-res-bp", cloud:"sp-res-cloud" };
+const RES_ICON = k => RES_SP[k]
+  ? `<span class="sp ${RES_SP[k]}" role="img" aria-label="${RES_META[k].name}"></span>`
+  : `<img src="${RES_META[k].img}" alt="${RES_META[k].name}">`;
+/* Vé: một sprite dùng chung cho hai loại, nhãn chữ nằm riêng trong DOM. */
+const TK_SP = `<span class="sp sp-res-ticket" role="img" aria-hidden="true"></span>`;
+
+/* ================= Tài nguyên HUD ================= */
+function renderHud() {
+  const res = Object.keys(RES_META).map(k =>
+    `<div class="res ${k}" title="${RES_META[k].name}">${RES_ICON(k)}<b>${W ? fmt(W[k]) : "…"}</b></div>`
+  ).join("") +
+  (W && (Number(W.tgen) > 0 || Number(W.tsud) > 0)
+    ? `<div class="res tk" title="Vé chơi game — mỗi loại được tặng miễn phí mỗi ngày">
+         <span class="tk-i" title="Vé máy phát">${TK_SP}Vé máy phát <b class="tk-n">${fmt(W.tgen)}</b></span>
+         <span class="tk-i" title="Vé sudoku">${TK_SP}Vé sudoku <b class="tk-n">${fmt(W.tsud)}</b></span>
+       </div>`
+    : "");
+  const wallet = W
+    ? `<button type="button" class="wallet-chip" onclick="navigate('wallet')" title="Mở Ví ruby để xem chi tiết và rút ruby">
+         <span class="wl-ic">💎</span>
+         <span class="wl-tx"><span class="lab">Ví ruby</span><b>${fmt(W.wallet)}</b><span class="cap">Hôm nay +${fmt(W.earned)}/${fmt(W.cap)}</span></span>
+       </button>`
+    : `<div class="load-chip">⏳ Đang tải…</div>`;
+  $("hud").innerHTML = `<button type="button" class="hud-search" onclick="focusGameSearch()" title="Tìm mini game"><span class="search-mark" aria-hidden="true">⌕</span><span>Tìm mini game…</span><kbd>Ctrl K</kbd></button><div class="hud-res">${res}</div>` + wallet +
+    (CONN ? "" : `<button type="button" class="warn-chip" onclick="retryAll()" title="Chưa tải được dữ liệu từ máy chủ — bấm để thử lại">⚠️ Mất kết nối · Thử lại</button>`) +
+    `<a class="back-chip" href="${BACK_URL}"><span class="back-mark" aria-hidden="true">↩</span><span>Về game</span></a>`;
+  $("side_wallet").textContent = W ? fmt(W.wallet) : "—";
+  const sc = $("side_cap"); if (sc) sc.textContent = W ? fmt(W.cap) : "—";
+}
+
+async function loadWallet() {
+  const r = await api("wallet/mywallet.php", {});
+  if (r.STATE === "SUCCESS") { W = r; renderHud(); return true; }
+  netFail(true);
+  return false;
+}
+
+async function loadCheckin() {
+  const r = await api("wallet/checkin.php", { ACTION:"info" });
+  if (r.STATE === "SUCCESS") { CI = r; return true; }
+  netFail(true);
+  return false;
+}
+
+/* Tải lại toàn bộ trạng thái; trả về true khi cả ví lẫn điểm danh đều đọc được. */
+async function refreshAll() {
+  const [okW, okC] = await Promise.all([loadWallet(), loadCheckin()]);
+  renderHud();
+  return okW && okC;
+}
+
+async function retryAll() {
+  toast("Đang kết nối lại máy chủ…", true);
+  CONN = await refreshAll();
+  renderHud();
+  toast(CONN ? "Đã kết nối lại ✅" : "Vẫn chưa tải được dữ liệu máy chủ", CONN);
+  navigate(activeView());
+}
+
+/* quiet = chỉ bật chip cảnh báo, không thêm toast (dùng khi lỗi đã có thông báo riêng). */
+function netFail(quiet) {
+  CONN = false; renderHud();
+  if (!quiet) toast("Không gọi được máy chủ — bấm ⚠️ trên thanh trên để thử lại", false);
+}
+
+function activeView() {
+  const on = document.querySelector(".nav button.on");
+  return on ? on.dataset.v : "home";
+}
+
+function focusGameSearch() {
+  if (activeView() !== "home") navigate("home");
+  const input = $("game_search");
+  if (input) { input.focus(); input.select(); }
+}
+
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    focusGameSearch();
+  }
+});
+
+function toast(msg, ok) {
+  const t = $("toast"); t.className = ok ? "ok" : "err"; t.textContent = msg;
+  t.style.opacity = 1; clearTimeout(t._tm);
+  t._tm = setTimeout(() => t.style.opacity = 0, 2600);
+}
+function typLabel(t) { return { GOLD:"vàng", RUBY:"ruby", BP:"BP", CLOUD:"mảnh mây", ESSENCE:"essence", GTICKET:"vé máy phát", STICKET:"vé sudoku" }[t] || t; }
+function rwIcon(t) { return RES_IMG[String(t).toLowerCase()] || (t === "GTICKET" ? "🎫" : t === "STICKET" ? "🧩" : ""); }
+
+/* ================= Cooldown nút ================= */
+function lockStart(btn, sec) {
+  if (!btn) return;
+  btn.disabled = true; let t = Math.max(1, sec);
+  btn.textContent = btn.textContent.replace(/\s*\(\d+s\)/, "") + " (" + t + "s)";
+  const iv = setInterval(() => {
+    t--; if (!btn.isConnected) { clearInterval(iv); return; }
+    if (t <= 0) {
+      clearInterval(iv); btn.disabled = false;
+      btn.textContent = btn.textContent.replace(/\s*\(\d+s\)/, "");
+    } else btn.textContent = btn.textContent.replace(/\s*\(\d+s\)/, "") + " (" + t + "s)";
+  }, 1000);
+}
+
+async function award(game, score, resEl, startBtn) {
+  const r = await api("wallet/award.php", { GAME:game, SCORE:String(score) });
+  if (r.STATE === "SUCCESS") {
+    resEl.textContent = "+" + r.earned + " ruby 🎉"; resEl.style.color = "var(--ok)";
+    await loadWallet();
+  } else if (r.msg === "cooldown") {
+    const wait = Number(r.wait) || cdSec();
+    resEl.textContent = "Chờ " + wait + "s để nhận thưởng…"; resEl.style.color = "var(--dim)";
+    lockStart(startBtn, wait);
+  } else if (r.msg === "daily cap") {
+    resEl.textContent = "Đã đạt hạn mức " + fmt(capRuby()) + " ruby/ngày — mai quay lại nhé";
+    resEl.style.color = "var(--err)";
+  } else if (r.msg === "no reward") {
+    resEl.textContent = "Chưa đủ để nhận ruby, thử lại nhé"; resEl.style.color = "var(--dim)";
+  } else {
+    netFail();
+    resEl.textContent = "Lỗi kết nối máy chủ — bấm ⚠️ trên thanh trên để thử lại";
+    resEl.style.color = "var(--err)";
+  }
+}
+
+/* ================= Đăng ký mini game (mở rộng dễ: thêm 1 phần tử vào GAMES + _minigame_ruby trong serve.py) ================= */
+const GAMES = [
+  { id:"catch",  title:"Bắt vàng",   em:"🪙", desc:"Bấm thật nhanh đồng vàng rơi trong 30 giây.",
+    fee:"Miễn phí",
+    rwd:"score/10 · tối đa 30", page:() => pageCatch() },
+  { id:"memory", title:"Trí nhớ",    em:"🧠", desc:"Lật mở 8 cặp biểu tượng giống nhau.",
+    fee:"Miễn phí",
+    rwd:"1/cặp · tối đa 20", page:() => pageMemory() },
+  { id:"guess",  title:"Đoán số",    em:"🔢", desc:"Đoán số 1–100 trong ít lượt nhất.",
+    fee:"Miễn phí",
+    rwd:"đến 15", page:() => pageGuess() },
+  { id:"simon",  title:"Simon",      em:"🎵", desc:"Nhớ và lặp lại chuỗi màu.",
+    fee:"Miễn phí",
+    rwd:"đến 25", page:() => pageSimon() },
+  { id:"rps",    title:"Kéo búa bao", em:"✊", desc:"Thắng càng nhiều trong 3 trận.",
+    fee:"Miễn phí",
+    rwd:"5/thắng · tối đa 15", page:() => pageRps() },
+  { id:"slide",  title:"2048",        em:"🔢", desc:"Trượt hợp ô, gộp lên tới 2048.",
+    fee:"Miễn phí",
+    rwd:"ô tối đa/128 · tối đa 30", page:() => pageSlide() },
+  { id:"genrep", title:"Sửa máy phát", em:"⚙️", desc:"Dùng vé máy phát, skill-check để sửa máy. Miss đủ là thua.",
+    fee:"1 vé ⚙️", rwd:"10/20/50/150 · +thưởng mỗi Great", ticket:"generator",
+    fees:[
+      ["Mức", "Phí", "Thưởng", "Bonus mỗi Great", "Thua khi"],
+      ["Easy", "1 vé", "10 💎", "+1", "3 miss"],
+      ["Normal", "1 vé", "20 💎", "+2", "3 miss"],
+      ["Hard", "1 vé", "50 💎", "+3", "5 miss"],
+      ["Nightmare", "1 vé", "150 💎", "+7", "10 miss"]
+    ],
+    note:"Chơi bằng vé máy phát (1 vé/lượt, mọi độ khó). Vé máy phát chỉ được tặng miễn phí 3 vé mỗi ngày, không bán bằng vàng. Chưa mở server offline thì mặc định thực hành miễn phí.",
+    embed:"/minigame/generator_repair.html",
+    page:() => pageEmbed("genrep") },
+  { id:"sudoku", title:"Sudoku",     em:"🧩", desc:"Dùng vé sudoku, giải trong giới hạn giờ theo độ khó.",
+    fee:"1 vé 🧩", rwd:"10/20/35/50 theo độ khó", ticket:"sudoku",
+    fees:[
+      ["Mức", "Giờ", "Phí", "Thưởng"],
+      ["Dễ", "10 phút", "1 vé", "10 💎"],
+      ["Trung bình", "15 phút", "1 vé", "20 💎"],
+      ["Khó", "20 phút", "1 vé", "35 💎"],
+      ["Chuyên gia", "25 phút", "1 vé", "50 💎"]
+    ],
+    note:"Chơi bằng vé sudoku (1 vé/lượt). Vé sudoku được tặng miễn phí 3 vé mỗi ngày, hết thì mua thêm bằng vàng trong Ví. Hết giờ là thua — mất vé. Nhập/Lưu/Mở ma trận là thực hành, không tính thưởng.",
+    embed:"/minigame/sudoku.html",
+    page:() => pageEmbed("sudoku") },
+];
+
+/* ================= Điều hướng ================= */
+/* Sprite cho 3 mini game có asset; game khác vẫn dùng emoji. */
+const NAV_SP = { catch:"sp-nav-catch", memory:"sp-nav-memory", sudoku:"sp-nav-sudoku" };
+/* Icon sprite cho thẻ mini game (chỉ game có asset; game khác vẫn dùng emoji). */
+const CARD_SP = { catch:"sp-game-gold-mine" };
+const CARD_ART = {
+  catch: "assets/rubyfarm/rubyfarm_game_catch_goldmine.png",
+  memory: "assets/rubyfarm/rubyfarm_game_memory_crystals.png",
+  guess: "assets/rubyfarm/rubyfarm_game_guess_orbs.png",
+  simon: "assets/rubyfarm/rubyfarm_game_simon_wheel.png",
+  rps: "assets/rubyfarm/rubyfarm_game_rock_paper_scissors.png",
+  slide: "assets/rubyfarm/rubyfarm_game_2048.png",
+  genrep: "assets/rubyfarm/rubyfarm_game_generator_repair.png",
+  sudoku: "assets/rubyfarm/rubyfarm_game_sudoku.png"
+};
+function buildNav() {
+  const n = $("nav");
+  let h = `<div class="grp">Chính</div>
+           <button data-v="home" onclick="navigate('home')"><span class="ic">🏠</span> Trang chủ</button>
+           <button data-v="checkin" onclick="navigate('checkin')"><span class="ic">📅</span> Điểm danh</button>
+           <button data-v="wallet" onclick="navigate('wallet')"><span class="ic">💳</span> Ví &amp; Rút ruby</button>
+           <button data-v="convert" onclick="navigate('convert')"><span class="ic">💱</span> Quy đổi tài nguyên</button>
+           <div class="grp">Trang trại</div>
+           <a href="moss_moon/index.html"><span class="ic">🌿</span> Moss &amp; Moon</a>`;
+  h += `<div class="grp">Mini game</div>`;
+  h += GAMES.map(g => {
+    const cap = (String(g.rwd).match(/\d+/g) || ["0"]).pop();
+    const sp = NAV_SP[g.id];
+    const ic = sp
+      ? `<span class="sp ${sp}" role="img" aria-label="${g.title}"></span>`
+      : g.em;
+    return `<button data-v="g-${g.id}" onclick="navigate('g-${g.id}')"><span class="ic">${ic}</span> ${g.title}` +
+           `<span class="rwd">≤${cap}</span></button>`;
+  }).join("");
+  n.innerHTML = h;
+}
+
+function navigate(v) {
+  currentGame = null;
+  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.v === v));
+  const view = $("view");
+  view.innerHTML = "";
+  if (v === "home") pageHome();
+  else if (v === "checkin") pageCheckin();
+  else if (v === "wallet") pageWallet();
+  else if (v === "convert") pageConvert();
+  else if (v.startsWith("g-")) {
+    const g = GAMES.find(x => "g-" + x.id === v);
+    if (g) {
+      view.innerHTML = `<div class="card gwrap"><h2><span class="hb">${g.em}</span>${g.title}</h2>
+                        <div class="desc">${g.desc}</div>
+                        ${g.ticket ? reqRow(g) : ""}
+                        ${g.fees ? renderFeeTable(g.fees) : ""}
+                        ${g.note ? `<div class="ci_note">⚠️ ${g.note}</div>` : ""}
+                        <div id="gstage"></div></div>`;
+      g.page();
+    }
+  }
+  window.scrollTo({ top:0 });
+}
+
+/* ---------- Điều kiện vào game bằng vé ---------- */
+function reqRow(g) {
+  const isGen = g.ticket === "generator";
+  const have = W ? Number(isGen ? W.tgen : W.tsud) : null;
+  const enough = have !== null && have > 0;
+  const free = W ? Number((W.tfree || {})[g.ticket] || 0) : 0;
+  const name = isGen ? "máy phát ⚙️" : "sudoku 🧩";
+  const more = isGen
+    ? `Vé được tặng miễn phí ${free} cái mỗi ngày (không bán bằng vàng) — dùng hết thì chờ mai.`
+    : `Vé được tặng miễn phí ${free} cái mỗi ngày, hết thì mua thêm bằng vàng trong <a href="#" onclick="navigate('wallet');return false">Ví</a>.`;
+  return `<div class="req ${enough ? "ok" : (have === null ? "" : "no")}" id="req_row">
+    <span>${enough ? "✅" : (have === null ? "⏳" : "⛔")}</span>
+    <span>Cần <b>1 vé ${name}</b> mỗi lượt · đang có <b>${have === null ? "…" : fmt(have)} vé</b></span>
+    <span class="dim">${enough ? "" : more}</span>
+  </div>`;
+}
+
+/* Ví đổi (ví dụ game nhúng vừa trừ vé) thì cập nhật lại cả HUD lẫn dòng điều kiện vé. */
+async function refreshWalletAndRow() {
+  await loadWallet();
+  const g = GAMES.find(x => x.id === currentGame);
+  const box = $("req_row");
+  if (g && g.ticket && box) box.outerHTML = reqRow(g);
+}
+
+/* ---------- Embedded game (iframe + award bridge) ---------- */
+function renderFeeTable(rows) {
+  return `<div class="fee_tbl"><table><thead><tr>${rows[0].map(c => `<th>${c}</th>`).join("")}</tr></thead>
+    <tbody>${rows.slice(1).map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>`;
+}
+function pageEmbed(gameId) {
+  const g = GAMES.find(x => x.id === gameId);
+  if (!g) return;
+  const stage = $("gstage");
+  stage.innerHTML = `
+    <iframe class="embframe" src="${g.embed}" title="${g.title}"></iframe>
+    <div class="gres" id="emb_res"></div>`;
+  $("emb_res").textContent = "Hoàn thành game để nhận ruby (máy chủ tự tính thưởng).";
+  currentGame = gameId;
+}
+window.addEventListener("message", e => {
+  const d = e.data;
+  if (d && d.rubyfarm === "award" && d.game && d.game === currentGame) {
+    const res = $("emb_res");
+    if (res) award(d.game, Number(d.score) || 0, res);
+  } else if (d && d.rubyfarm === "refresh") {
+    refreshWalletAndRow();
+  }
+});
+
+/* ================= Thẻ mini game (chỉ hiển thị) ================= */
+/* Số vé còn lại của game dùng vé; null khi chưa đọc được ví. */
+function gameTicketLeft(g) {
+  if (!g.ticket || !W) return null;
+  return Number(g.ticket === "generator" ? W.tgen : W.tsud) || 0;
+}
+function gameLimitText(g) {
+  if (!g.ticket) return `Nghỉ ${cdSec()}s/lượt · ${fmt(capRuby())} ruby/ngày`;
+  const free = W ? Number((W.tfree || {})[g.ticket] || 0) : null;
+  return `1 vé/lượt · tặng ${free === null ? "…" : fmt(free)} vé/ngày`;
+}
+function gameStateText(g) {
+  if (!W) return { txt:"⏳ Đang tải…", cls:"", locked:false };
+  if (!g.ticket) {
+    const left = Math.max(0, Number(W.cap) - Number(W.earned));
+    return left > 0
+      ? { txt:`Còn ${fmt(left)} ruby hạn mức hôm nay`, cls:"ok", locked:false }
+      : { txt:"Hết hạn mức hôm nay — mai chơi tiếp", cls:"no", locked:false };
+  }
+  const have = gameTicketLeft(g);
+  if (have > 0) return { txt:`Còn ${fmt(have)} vé`, cls:"ok", locked:false };
+  return g.ticket === "generator"
+    ? { txt:"Hết vé — mai được tặng tiếp", cls:"no", locked:true }
+    : { txt:"Hết vé — mua thêm trong Ví", cls:"no", locked:true };
+}
+function rwPic(t) {
+  const ic = rwIcon(t);
+  if (!ic) return "";
+  return ic.startsWith("image/") || ic.startsWith("assets/") ? `<img src="${ic}" alt="${typLabel(t)}">` : `<span class="emo">${ic}</span>`;
+}
+function gameCard(g) {
+  const st = gameStateText(g);
+  const kind = g.ticket ? `Vé ${g.ticket === "generator" ? "⚙️" : "🧩"}` : "Miễn phí";
+  const art = CARD_ART[g.id]
+    ? `<img class="g-art" src="${CARD_ART[g.id]}" alt="" loading="lazy">`
+    : "";
+  return `<button type="button" class="gcard${st.locked ? " locked" : ""}" onclick="navigate('g-${g.id}')">
+    ${art}
+    <span class="g-top"><span class="g-ic">${CARD_SP[g.id] ? `<span class="sp ${CARD_SP[g.id]}" role="img" aria-label="${g.title}"></span>` : g.em}</span><span class="g-name">${g.title}</span>
+      <span class="g-kind${g.ticket ? " tk" : ""}">${kind}</span></span>
+    <span class="g-desc">${g.desc}</span>
+    <span class="g-meta">
+      <span class="g-mi"><i>Phí</i><b>${g.fee || "Miễn phí"}</b></span>
+      <span class="g-mi"><i>Thưởng (ruby)</i><b class="gold">${g.rwd}</b></span>
+      <span class="g-mi"><i>Giới hạn</i><b>${gameLimitText(g)}</b></span></span>
+    <span class="g-foot"><span class="g-state ${st.cls}">${st.txt}</span><span class="play">Chơi ngay ▶</span></span>
+  </button>`;
+}
+
+/* ================= Trang chủ ================= */
+function pageHome() {
+  const v = $("view");
+  v.innerHTML = `
+    <div class="hero">
+      <div class="eyebrow">Khu vườn ruby của bạn</div>
+      <h1>RUBY <em>FARM</em></h1>
+      <p>Chơi mini game, bỏ ruby vào ví rồi rút về tài khoản game. Điểm danh mỗi ngày nhận thêm quà.</p>
+      <div class="act">
+        <button class="btn gold lg" onclick="navigate('checkin')">📅 Điểm danh hôm nay</button>
+        <button class="btn ghost lg" onclick="navigate('wallet')">💳 Rút ruby</button>
+        <a class="btn gold lg" href="moss_moon/index.html">🌿 Chơi Moss &amp; Moon</a>
+      </div>
+    </div>
+    <div class="homeblk">
+      <div class="card">
+        <div class="discovery-head">
+          <div class="discovery-copy">
+            <h2>Khám phá mini game</h2>
+            <div class="desc">Chơi để kiếm ruby vào ví. Game miễn phí nghỉ ${cdSec()} giây mỗi lượt, dùng chung hạn mức <b id="home_cap">…</b> ruby/ngày.</div>
+          </div>
+          <div class="discovery-tools">
+            <label class="game-search" for="game_search">
+              <span class="search-mark" aria-hidden="true">⌕</span>
+              <input id="game_search" type="search" placeholder="Tìm mini game…" autocomplete="off">
+            </label>
+            <div class="filter-tabs" id="game_filters" aria-label="Lọc mini game">
+              <button type="button" class="filter-tab on" data-filter="all">Tất cả</button>
+              <button type="button" class="filter-tab" data-filter="free">Miễn phí</button>
+              <button type="button" class="filter-tab" data-filter="ticket">Dùng vé</button>
+            </div>
+          </div>
+        </div>
+        <div class="grid" id="game_grid"></div>
+      </div>
+      <div class="card" id="chk_quick">
+        <h2>📅 Điểm danh hôm nay</h2>
+        <div id="ci_quick"></div>
+      </div>
+    </div>`;
+  $("game_search").addEventListener("input", e => {
+    homeQuery = e.target.value.trim().toLowerCase();
+    renderHomeDynamic();
+  });
+  document.querySelectorAll("#game_filters .filter-tab").forEach(btn => {
+    btn.addEventListener("click", () => setHomeFilter(btn.dataset.filter));
+  });
+  renderHomeDynamic();
+  loadWallet().then(renderHomeDynamic);
+}
+
+function setHomeFilter(filter) {
+  homeFilter = ["all", "free", "ticket"].includes(filter) ? filter : "all";
+  document.querySelectorAll("#game_filters .filter-tab").forEach(btn => {
+    btn.classList.toggle("on", btn.dataset.filter === homeFilter);
+  });
+  renderHomeDynamic();
+}
+
+function filterGames(games) {
+  return games.filter(g => {
+    const matchesType = homeFilter === "all"
+      || (homeFilter === "free" && !g.ticket)
+      || (homeFilter === "ticket" && Boolean(g.ticket));
+    const haystack = `${g.title} ${g.desc}`.toLowerCase();
+    return matchesType && (!homeQuery || haystack.includes(homeQuery));
+  });
+}
+
+function renderHomeDynamic() {
+  const hc = $("home_cap"); if (hc) hc.textContent = W ? fmt(W.cap) : "…";
+  const gg = $("game_grid"); if (gg) {
+    const games = filterGames(GAMES);
+    gg.innerHTML = games.length
+      ? games.map(gameCard).join("")
+      : `<div class="card inner center"><div class="desc">Không tìm thấy mini game phù hợp.</div></div>`;
+  }
+  renderQuickCheckin();
+}
+
+function renderQuickCheckin() {
+  const q = $("ci_quick"); if (!q) return;
+  q.innerHTML = checkinPanel({ compact:true });
+}
+
+async function quickClaim(btn) {
+  if (btn) { btn.disabled = true; btn.textContent = "Đang nhận…"; }
+  const r = await api("wallet/checkin.php", { ACTION:"claim" });
+  if (r.STATE === "SUCCESS") {
+    toast("Nhận " + fmt(r.amount) + " " + typLabel(r.claimed) + " 🎁", true);
+    await loadCheckin(); await loadWallet();
+    renderQuickCheckin();
+    if ($("ci_grid")) renderCheckin();
+  } else {
+    if (btn) { btn.disabled = false; btn.textContent = "Nhận quà hôm nay"; }
+    if (r.msg === "already") toast("Hôm nay đã điểm danh rồi", false);
+    else netFail();
+  }
+}
+
+/* ================= Điểm danh full ================= */
+/* Chuỗi ngày đã điểm danh liền nhau, tính ngược từ hôm nay (hoặc hôm qua nếu hôm nay chưa nhận). */
+function checkinStreak(days, today) {
+  const set = new Set(days);
+  let d = set.has(today) ? today : today - 1, n = 0;
+  while (d >= 1 && set.has(d)) { n++; d--; }
+  return n;
+}
+function chkStrip(days, today, total, compact) {
+  if (!total) return "";
+  const set = new Set(days);
+  let from = 1, to = total;
+  if (compact) { to = Math.min(total, 7); if (today > to) { to = today; from = Math.max(1, today - 6); } }
+  let out = "";
+  for (let d = from; d <= to; d++) {
+    const claimed = set.has(d);
+    const cls = claimed ? "done" : (d === today ? "today" : (d > today ? "later" : ""));
+    out += `<span class="s ${cls}" title="Ngày ${d}${claimed ? " — đã nhận" : ""}"><span>N${d}</span><span class="v">${claimed ? "✓" : "•"}</span></span>`;
+  }
+  return `<div class="chk-strip">${out}</div>`;
+}
+/* Bảng điểm danh dùng chung cho trang chủ (compact) và trang điểm danh (onDetail). */
+function checkinPanel(opts) {
+  const o = opts || {};
+  if (!CI) {
+    return CONN
+      ? `<div class="chk"><div class="rate">⏳ Đang tải lịch điểm danh…</div></div>`
+      : `<div class="chk"><div class="chk-state no">⚠️ Chưa tải được lịch điểm danh.</div>
+         <div class="act"><button class="btn ghost" onclick="retryAll()">Thử lại</button></div></div>`;
+  }
+  const total = (CI.rewards || []).length;
+  const days = (CI.days || []).map(Number);
+  const today = Number(CI.today);
+  const claimed = days.includes(today);
+  const rw = CI.rewards[today - 1] || ["RUBY", 0];
+  const streak = checkinStreak(days, today);
+  const btns = [];
+  if (!claimed) btns.push(`<button class="btn gold lg" onclick="quickClaim(this)">Nhận quà hôm nay</button>`);
+  if (!o.onDetail) btns.push(`<button class="btn ghost lg" onclick="navigate('checkin')">Xem lịch quà</button>`);
+  return `<div class="chk">
+    <div class="chk-day">Ngày ${today}${total ? " / " + total : ""}</div>
+    <div class="chk-rw"><span class="cr-ic">${rwPic(rw[0])}</span>
+      <span class="cr-tx"><span class="v">${short(rw[1])}</span><span class="l">${typLabel(rw[0])} — quà hôm nay</span></span></div>
+    <div class="chk-state${claimed ? " ok" : ""}">${claimed ? "✅ Hôm nay đã điểm danh — quay lại ngày mai nhé" : "🎁 Hôm nay chưa điểm danh"}</div>
+    ${streak > 1 ? `<div class="chk-streak">🔥 Đã điểm danh ${streak} ngày liên tiếp</div>` : ""}
+    ${btns.length ? `<div class="act">${btns.join("")}</div>` : ""}
+    ${o.strip === false ? "" : chkStrip(days, today, total, !!o.compact)}
+  </div>`;
+}
+
+function pageCheckin() {
+  const v = $("view");
+  v.innerHTML = `<div class="card">
+    <div class="ci_head">
+      <h2>📅 <span>Điểm danh hằng ngày</span></h2>
+      <span class="rate" id="ci_state"></span>
+    </div>
+    <div id="ci_today"></div>
+    <h3 class="sec">Lịch quà cả tháng</h3>
+    <div class="ci_grid" id="ci_grid"></div>
+    <div class="ci_note">Mỗi ngày nhận 1 lần, danh sách quà tự làm mới đầu tháng. Biểu tượng dùng đúng tài nguyên trong game.</div>
+  </div>`;
+  renderCheckin();
+}
+function renderCheckin() {
+  const grid = $("ci_grid"); if (!grid) return;
+  const today = $("ci_today"); if (today) today.innerHTML = checkinPanel({ strip:false, onDetail:true });
+  const st = $("ci_state");
+  if (!CI) { grid.innerHTML = ""; if (st) st.textContent = ""; return; }
+  grid.innerHTML = "";
+  const days = (CI.days || []).map(Number);
+  let done = 0;
+  CI.rewards.forEach((rw, i) => {
+    const day = i + 1; const claimed = days.includes(day); if (claimed) done++;
+    const cell = document.createElement("div");
+    cell.className = "cid" + (claimed ? " done" : "") + (day === CI.today ? " today" : "") + (day > CI.today ? " later" : "");
+    cell.innerHTML = `<div class="d">Ngày ${day}</div><div class="rw">${rwPic(rw[0])}${short(rw[1])}</div>`;
+    if (day === CI.today && !claimed) {
+      const b = document.createElement("button"); b.className = "btn gold get"; b.textContent = "Nhận";
+      b.onclick = () => claimDay(cell, b);
+      cell.appendChild(b);
+    }
+    grid.appendChild(cell);
+  });
+  if (st) st.textContent = "Đã điểm danh " + done + "/" + CI.rewards.length + " ngày";
+}
+async function claimDay(cell, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = "Đang nhận…"; }
+  const r = await api("wallet/checkin.php", { ACTION:"claim" });
+  if (r.STATE === "SUCCESS") {
+    toast("Nhận " + fmt(r.amount) + " " + typLabel(r.claimed) + " 🎁", true);
+    CI = r; renderCheckin(); await loadWallet();
+  } else {
+    if (btn) { btn.disabled = false; btn.textContent = "Nhận"; }
+    if (r.msg === "already") toast("Hôm nay đã điểm danh rồi", false);
+    else netFail();
+  }
+}
+
+/* ================= Ví & Rút ================= */
+function pageWallet() {
+  const v = $("view");
+  v.innerHTML = `
+    <div class="card narrow">
+      <h2>💳 <span>Ví ruby &amp; tài khoản</span></h2>
+      <div class="desc">Ruby kiếm từ mini game nằm ở "ví". Bấm rút để chuyển sang ruby tài khoản game (reload game mới thấy).</div>
+      <div class="stat-grid" id="wbox"></div>
+      <div class="wd">
+        <span class="lab">Rút về tài khoản:</span>
+        <input type="number" id="wd_amt" min="1" placeholder="Số ruby">
+        <button class="btn gold" id="wd_btn" onclick="withdraw(this)">Rút</button>
+        <span class="rate" id="wmax"></span>
+      </div>
+      <h3 class="sec">🎫 Vé chơi game</h3>
+      <div class="wd-note">Mỗi loại vé được tặng miễn phí hằng ngày. Vé máy phát chỉ có nguồn miễn phí; vé sudoku hết thì mua thêm bằng vàng.</div>
+      <div id="tbox"></div>
+    </div>`;
+  const box = $("wbox");
+  box.innerHTML = [["💎 Ruby trong ví", fmt(W ? W.wallet : 0), "gold"],
+                   ["💎 Ruby tài khoản", fmt(W ? W.ruby : 0), ""],
+                   ["🪙 Vàng tài khoản", fmt(W ? W.gold : 0), ""],
+                   ["⚡ Hôm nay kiếm", W ? fmt(W.earned) + " / " + fmt(W.cap) : "0", ""]]
+    .map(([k, val, cls]) => `<div class="stat-box ${cls}"><div class="k">${k}</div><div class="v">${val}</div></div>`).join("");
+  $("wmax").textContent = "Ví đang có " + fmt(W ? W.wallet : 0) + " ruby";
+  renderTickets();
+  if (!W) loadWallet().then(ok => { if (ok) pageWallet(); });
+}
+function renderTickets() {
+  const box = $("tbox"); if (!box) return;
+  if (!W) { box.innerHTML = `<div class="rate">⏳ Đang tải số vé…</div>`; return; }
+  const mk = (k, full, em, name, buyable) => `
+    <div class="card inner">
+      <div class="rowline">
+        <span class="fill">${em} ${name} — <b class="tk-n">${fmt(W["t" + k])}</b> vé</span>
+        ${buyable ? `
+        <span class="inline-ctl">
+          <input type="number" min="1" max="99" value="1" id="tbqty_${k}">
+          <button class="btn gold" onclick="buyTicket('${full}', $('tbqty_${k}').value || 1, this)">Mua ${fmt(W.tprices[full])} vàng/cái</button>
+        </span>`
+        : `<span class="rate">🎁 Tặng miễn phí ${fmt((W.tfree || {})[full] || 0)} vé mỗi ngày — không bán bằng vàng</span>`}
+      </div>
+    </div>`;
+  box.innerHTML = mk("gen", "generator", "⚙️", "Vé máy phát", false) + mk("sud", "sudoku", "🧩", "Vé sudoku", true);
+}
+async function buyTicket(type, n, btn) {
+  n = Math.max(1, Math.min(99, parseInt(n, 10) || 1));
+  if (btn) { btn.disabled = true; btn.textContent = "Đang mua…"; }
+  const r = await api("wallet/tickets.php", { ACTION:"buy", TYPE:type, AMOUNT:String(n) });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã mua " + n + " vé " + (type === "generator" ? "máy phát" : "sudoku") + " 🎫", true);
+    await loadWallet(); pageWallet();
+    return;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = "Mua " + fmt((W.tprices || {})[type]) + " vàng/cái"; }
+  if (r.msg === "need gold") {
+    toast("Không đủ vàng (cần " + fmt(r.price) + ", đang có " + fmt(r.gold) + ")", false);
+  } else if (r.msg === "bad type") {
+    toast("Loại vé không hợp lệ", false);
+  } else {
+    netFail();
+  }
+}
+async function withdraw(btn) {
+  const amt = parseInt($("wd_amt").value, 10);
+  if (!amt || amt <= 0) { toast("Nhập số ruby cần rút", false); return; }
+  if (btn) { btn.disabled = true; btn.textContent = "Đang gửi…"; }
+  const r = await api("wallet/withdraw.php", { AMOUNT:String(amt) });
+  if (r.STATE === "SUCCESS") {
+    toast("Đã gửi " + fmt(amt) + " ruby vào tài khoản game. Reload game để thấy!", true);
+    await loadWallet(); pageWallet();
+    return;
+  }
+  if (btn) { btn.disabled = false; btn.textContent = "Rút"; }
+  if (r.msg === "not enough") {
+    toast("Ví không đủ ruby để rút", false);
+  } else {
+    netFail();
+  }
+}
+
+/* ================= Mini game: Bắt vàng ================= */
+function pageCatch() {
+  const s = $("gstage");
+  s.innerHTML = `
+    <div class="arena" id="c_arena"><div id="c_tip" class="tip">Nhấn <b>Bắt đầu</b> rồi bấm vào đồng vàng rơi xuống</div></div>
+    <div class="grow"><button class="btn" id="c_btn">Bắt đầu</button>
+      <span class="stat">🪙 <span id="c_score">0</span></span>
+      <span class="stat">⏱ <span id="c_time">30s</span></span></div>
+    <div class="gres" id="c_res"></div>`;
+  let sc = 0, tm = null, sp = null, run = false;
+  const arena = $("c_arena"), btn = $("c_btn");
+  const spawn = () => {
+    const tip = $("c_tip"); if (tip) tip.remove();
+    const co = document.createElement("div");
+    co.className = "coin"; co.textContent = "🪙";
+    co.style.left = (Math.random()*92) + "%"; co.style.top = "-44px";
+    arena.appendChild(co);
+    const iv = setInterval(() => {
+      const top = parseFloat(co.style.top);
+      if (top > arena.clientHeight) { clearInterval(iv); co.remove(); }
+      else co.style.top = (top + 4) + "px";
+    }, 28);
+    co.onclick = () => { clearInterval(iv); co.remove(); sc++; $("c_score").textContent = sc; };
+  };
+  btn.onclick = () => {
+    if (run) return;
+    run = true; sc = 0; $("c_score").textContent = "0"; $("c_res").textContent = "";
+    arena.innerHTML = ""; btn.disabled = true; let t = 30; $("c_time").textContent = t + "s";
+    tm = setInterval(() => { t--; $("c_time").textContent = t+"s"; if (t<=0) stop(); }, 1000);
+    sp = setInterval(spawn, 420);
+  };
+  const stop = () => {
+    clearInterval(tm); clearInterval(sp); run = false; btn.disabled = false;
+    award("catch", sc, $("c_res"), btn);
+  };
+}
+
+/* ================= Mini game: Trí nhớ ================= */
+function pageMemory() {
+  const s = $("gstage");
+  const IC = ["🐶","🐱","🦊","🐻","🐼","🦄","🐸","🐵"];
+  s.innerHTML = `
+    <div class="memgrid" id="m_grid"></div>
+    <div class="grow"><button class="btn" id="m_btn">Chơi mới</button>
+      <span class="stat">Cặp: <span id="m_score">0/8</span></span></div>
+    <div class="gres" id="m_res"></div>`;
+  let first = null, lock = false, pairs = 0;
+  const grid = $("m_grid"), btn = $("m_btn");
+  const start = () => {
+    const deck = [...IC, ...IC].sort(() => Math.random() - 0.5);
+    grid.innerHTML = ""; pairs = 0; first = null;
+    $("m_score").textContent = "0/8"; $("m_res").textContent = "";
+    deck.forEach(ic => {
+      const d = document.createElement("div");
+      d.className = "cardc"; d.textContent = "❓"; d.dataset.ic = ic;
+      d.onclick = () => flip(d);
+      grid.appendChild(d);
+    });
+  };
+  const flip = d => {
+    if (lock || d.classList.contains("open") || d.classList.contains("done")) return;
+    d.classList.add("open"); d.textContent = d.dataset.ic;
+    if (!first) { first = d; return; }
+    const a = first; first = null;
+    if (a.dataset.ic === d.dataset.ic) {
+      a.classList.add("done"); d.classList.add("done");
+      pairs++; $("m_score").textContent = pairs + "/8";
+      if (pairs === 8) award("memory", 8, $("m_res"), btn);
+    } else {
+      lock = true;
+      setTimeout(() => { a.classList.remove("open"); d.classList.remove("open");
+        a.textContent = "❓"; d.textContent = "❓"; lock = false; }, 550);
+    }
+  };
+  btn.onclick = start;
+  start();
+}
+
+/* ================= Mini game: Đoán số ================= */
+function pageGuess() {
+  const s = $("gstage");
+  s.innerHTML = `
+    <div class="grow"><input type="number" id="g_val" min="1" max="100">
+      <button class="btn" id="g_go">Đoán</button>
+      <button class="btn ghost" id="g_new">Số mới</button>
+      <span class="stat">Lượt: <span id="g_score">0</span></span></div>
+    <div class="gres dim" id="g_hint"></div>
+    <div class="gres" id="g_res"></div>`;
+  let target = 0, moves = 0;
+  const val = $("g_val"), score = $("g_score"), hint = $("g_hint"), res = $("g_res"), gbtn = $("g_go"), nbtn = $("g_new");
+  const init = () => { target = Math.floor(Math.random()*100)+1; moves = 0; val.value = "";
+                       score.textContent = "0"; hint.textContent = "Đoán số từ 1 đến 100"; res.textContent = ""; };
+  const go = () => {
+    const v = parseInt(val.value, 10);
+    if (isNaN(v) || v < 1 || v > 100) { toast("Nhập số từ 1 đến 100", false); return; }
+    moves++; score.textContent = moves;
+    if (v === target) { hint.textContent = "Chính xác! 🎉";
+      const m = moves; award("guess", m, res, nbtn); target = 0;
+    } else hint.textContent = v < target ? "Cao hơn nhé ↑" : "Thấp hơn nhé ↓";
+  };
+  gbtn.onclick = go; nbtn.onclick = init;
+  val.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  init();
+}
+
+/* ================= Mini game: Simon ================= */
+function pageSimon() {
+  const s = $("gstage");
+  const COL = ["#e05050","#50b050","#4a6fd0","#e0a040"];
+  s.innerHTML = `
+    <div class="sim" id="s_pads"></div>
+    <div class="grow mid"><button class="btn lg" id="s_btn">Bắt đầu</button>
+      <span class="stat">Cấp: <span id="s_lvl">0</span></span></div>
+    <div class="gres center" id="s_res"></div>`;
+  let seq = [], idx = 0, playing = false;
+  const pads = $("s_pads"), btn = $("s_btn"), res = $("s_res");
+  const flash = i => { const p = pads.children[i]; if (!p) return;
+                       p.classList.add("lit"); setTimeout(() => p.classList.remove("lit"), 300); };
+  const playSeq = () => {
+    playing = true; res.textContent = "Đang phát chuỗi…";
+    let delay = 0;
+    seq.forEach(k => { setTimeout(() => flash(k), delay); delay += 480; });
+    setTimeout(() => { playing = false; idx = 0; res.textContent = "Đến lượt bạn!"; }, delay + 250);
+  };
+  const start = () => { seq = [Math.floor(Math.random()*4)]; idx = 0;
+                        btn.disabled = true; $("s_lvl").textContent = "1"; res.textContent = ""; playSeq(); };
+  COL.forEach((c, i) => {
+    const p = document.createElement("div");
+    p.className = "pad"; p.style.background = c;
+    p.onclick = () => {
+      if (playing) return; flash(i);
+      if (seq[idx] === i) {
+        idx++;
+        if (idx === seq.length) { seq.push(Math.floor(Math.random()*4)); $("s_lvl").textContent = seq.length; setTimeout(playSeq, 650); }
+      } else {
+        const lvl = seq.length;
+        res.textContent = "Sai rồi — đạt cấp " + lvl; btn.disabled = false;
+        award("simon", lvl, res, btn);
+      }
+    };
+    pads.appendChild(p);
+  });
+  btn.onclick = start;
+}
+
+/* ================= Mini game: Kéo búa bao ================= */
+function pageRps() {
+  const s = $("gstage");
+  const OPTS = ["✊","✋","✌"];
+  s.innerHTML = `
+    <div class="rpsb">
+      ${OPTS.map((o,i) => `<button class="btn rp" data-p="${i}">${o}</button>`).join("")}
+      <button class="btn ghost" id="rp_new">Chơi mới</button>
+    </div>
+    <div class="gres dim" id="rp_res"></div>
+    <div class="gres" id="rp_fin"></div>`;
+  let wins = 0, round = 0;
+  const res = $("rp_res"), fin = $("rp_fin"), nbtn = $("rp_new");
+  document.querySelectorAll(".rpsb .rp").forEach(b => b.onclick = () => {
+    const p = Number(b.dataset.p);
+    const bot = Math.floor(Math.random()*3);
+    const win = (p===0&&bot===2)||(p===1&&bot===0)||(p===2&&bot===1);
+    round++;
+    let t = "Bạn " + OPTS[p] + " — Bot " + OPTS[bot] + " → ";
+    if (p === bot) t += "Hòa";
+    else if (win) { t += "Thắng 🎉"; wins++; }
+    else t += "Thua";
+    res.textContent = t + "   (" + wins + "/" + round + ")";
+    if (round >= 3) {
+      const w = wins; res.textContent = t + " — Cả lượt: thắng " + w;
+      award("rps", w, fin, nbtn); round = 0;
+    }
+  });
+  nbtn.onclick = () => { wins = 0; round = 0; res.textContent = "Lượt mới — 3 trận"; fin.textContent = ""; };
+}
+
+/* ================= Quy đổi tài nguyên ================= */
+const CUR_NAMES = { GOLD:"Vàng", RUBY:"Ruby", BP:"BP", CLOUD:"Cloud Piece", ESSENCE:"Essence" };
+const CUR_KEYS = ["gold", "ruby", "bp", "cloud", "essence"];
+const CUR_RES = { gold:RES_IMG.gold, ruby:RES_IMG.ruby, bp:RES_IMG.bp, cloud:RES_IMG.cloud, essence:RES_IMG.essence };
+const ALLOWED_CONVERT_PAIRS = new Set([
+  "GOLD>BP", "RUBY>BP", "GOLD>RUBY", "RUBY>GOLD", "RUBY>CLOUD", "RUBY>ESSENCE",
+]);
+let _convertRates = null;
+
+async function pageConvert() {
+  const v = $("view");
+  v.innerHTML = `
+    <div class="card wide">
+      <h2>💱 <span>Quy đổi tài nguyên</span></h2>
+      <div class="desc">Chỉ hỗ trợ Vàng → BP/Ruby và Ruby → BP/Vàng/Cloud Piece/Essence. Tỉ giá lấy từ server.</div>
+      <div class="bals" id="cv_bals"><div class="rate">⏳ Đang đọc số dư…</div></div>
+      <h3 class="sec">Chọn cặp quy đổi</h3>
+      <div id="cv_rows"><div class="rate">⏳ Đang đọc tỉ giá…</div></div>
+    </div>`;
+  const bals = await api("toolshop/get_balances.php", {});
+  if (!bals || bals.STATE !== "SUCCESS") {
+    toast("Không đọc được số dư — server còn chạy?", false);
+    const bl = $("cv_bals"); if (bl) bl.innerHTML = `<div class="rate">⚠️ Chưa đọc được số dư tài nguyên.</div>`;
+    const rw = $("cv_rows"); if (rw) rw.innerHTML = `<div class="rate">⚠️ Chưa đọc được tỉ giá.</div>
+      <div class="wd"><button class="btn ghost" onclick="retryAll()">Thử lại</button></div>`;
+    netFail();
+    return;
+  }
+  _convertRates = (bals.rates || []).filter(r =>
+    ALLOWED_CONVERT_PAIRS.has(`${r.from}>${r.to}`));
+  renderConvertBals(bals);
+  renderConvertRows();
+}
+function renderConvertBals(b) {
+  const el = $("cv_bals"); if (!el) return;
+  el.innerHTML = CUR_KEYS.map(k =>
+    `<div class="cid"><div class="d">${CUR_NAMES[k.toUpperCase()]}</div>
+     <div class="rw"><img src="${CUR_RES[k]}" alt="${CUR_NAMES[k.toUpperCase()]}">${fmt(b[k])}</div></div>`).join("");
+}
+function renderConvertRows() {
+  const el = $("cv_rows"); if (!el) return;
+  if (!_convertRates.length) { el.innerHTML = `<div class="rate">Không có cặp nào khả dụng</div>`; return; }
+  el.innerHTML = _convertRates.map((r, i) => `
+    <div class="card inner">
+      <div class="rowline">
+        <span class="fill"><b>${CUR_NAMES[r.from]} → ${CUR_NAMES[r.to]}</b>
+          <span class="rate">${fmt(r.cost)} ${CUR_NAMES[r.from]} = ${fmt(r.gain)} ${CUR_NAMES[r.to]}</span></span>
+        <span class="inline-ctl">
+          <input type="number" min="1" value="100000" id="cv_qty_${i}" oninput="updateEst('${i}')">
+          <button class="btn gold" onclick="doConvertR('${r.from}','${r.to}','${i}')">Đổi</button>
+        </span>
+      </div>
+      <div class="rate" id="cv_est_${i}"></div>
+    </div>`).join("");
+  _convertRates.forEach((r, i) => updateEst(i));
+}
+function updateEst(i) {
+  const r = _convertRates[i], n = Math.floor(Number($("cv_qty_" + i)?.value || 0) || 0);
+  const el = $("cv_est_" + i);
+  if (el) el.textContent = "Bỏ " + fmt(n) + " " + CUR_NAMES[r.from] + " → nhận ~" + fmt(Math.floor(n * r.gain / r.cost)) + " " + CUR_NAMES[r.to];
+}
+async function doConvertR(from, to, i) {
+  const q = $("cv_qty_" + i); if (!q) return;
+  const n = Math.floor(Number(q.value || 0) || 0);
+  if (n <= 0) { toast("Nhập số lượng hợp lệ", false); return; }
+  const res = await api("toolshop/convert.php", { FROM:from, TO:to, COUNT:String(n) });
+  if (res.STATE === "SUCCESS") {
+    toast("Đổi thành công: +" + fmt(res.gained) + " " + CUR_NAMES[to] + " (mất " + fmt(res.spent) + " " + CUR_NAMES[from] + ")", true);
+    const bals = await api("toolshop/get_balances.php", {});
+    if (bals && bals.STATE === "SUCCESS") renderConvertBals(bals);
+  } else {
+    toast(res.msg === "not enough" ? "Không đủ tài nguyên" : "Lỗi đổi (to: " + res.msg + ")", false);
+  }
+}
+
+/* ================= Mini game: 2048 ================= */
+function pageSlide() {
+  const s = $("gstage");
+  s.innerHTML = `
+    <div class="sl_board" id="sl_board"></div>
+    <div class="grow mid">
+      <button class="btn lg" id="sl_btn">Bắt đầu</button>
+      <span class="stat">🎯 <span id="sl_score">0</span></span></div>
+    <div class="gres center" id="sl_res"></div>
+    <div class="ci_note center">Dùng phím mũi tên hoặc vuốt. Ghép 2 ô bằng nhau, ô tối đa càng cao càng nhiều ruby.</div>`;
+  let grid = [], over = false;
+  const board = $("sl_board"), btn = $("sl_btn"), res = $("sl_res");
+  const COL = {
+    2:"#e7e4d3",4:"#e4d9a8",8:"#e3c37a",16:"#e3a14a",32:"#e07c3f",64:"#dc5f2e",
+    128:"#d94b3d",256:"#c93a36",512:"#c1292f",1024:"#b01b2b",2048:"#99132a"
+  };
+  const render = () => {
+    board.innerHTML = grid.flat().map((v, i) => {
+      const ll = v ? Math.max(0, 30 - Math.floor(Math.log2(v)) * 2.5) : 34;
+      return `<div style="height:72px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:${ll}px;background:${v ? COL[Math.min(v,2048)] : 'rgba(255,255,255,.04)'};color:${v >= 8 ? '#fff' : '#7d6a3a'}">${v || ""}</div>`;
+    }).join("");
+  };
+  const spawn = () => {
+    const empty = [];
+    grid.forEach((v, i) => { if (!v) empty.push(i); });
+    if (!empty.length) return;
+    grid[empty[Math.floor(Math.random() * empty.length)]] = Math.random() < 0.9 ? 2 : 4;
+  };
+  const compress = a => {
+    const o = a.filter(v => v);
+    for (let i = 0; i + 1 < o.length; i++)
+      if (o[i] === o[i + 1]) { o[i] *= 2; o.splice(i + 1, 1); }
+    while (o.length < 4) o.push(0);
+    return o;
+  };
+  const move = dir => {
+    if (over) return;
+    const before = grid.map(r => r.join(",")).join("|");
+    const collect = (dir === "left" || dir === "right")
+      ? r => [grid[r][0], grid[r][1], grid[r][2], grid[r][3]]
+      : r => [grid[0][r], grid[1][r], grid[2][r], grid[3][r]];
+    const place = (dir === "left" || dir === "right")
+      ? (r, a) => a.forEach((v, c) => { grid[r][c] = v; })
+      : (r, a) => a.forEach((v, c) => { grid[c][r] = v; });
+    for (let r = 0; r < 4; r++) {
+      let a = collect(r);
+      if (dir === "right" || dir === "down") a.reverse();
+      a = compress(a);
+      if (dir === "right" || dir === "down") a.reverse();
+      place(r, a);
+    }
+    if (grid.map(r => r.join(",")).join("|") === before) return;
+    spawn();
+    const best = Math.max(0, ...grid.flat());
+    $("sl_score").textContent = best;
+    render();
+  };
+  const checkOver = () => {
+    const flat = grid.flat();
+    if (flat.includes(0)) return false;
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) {
+      const v = grid[r][c];
+      if (c < 3 && grid[r][c+1] === v) return false;
+      if (r < 3 && grid[r+1][c] === v) return false;
+    }
+    return true;
+  };
+  const start = () => {
+    grid = [[0,0,0,0],[0,0,0,0],[0,0,0,0],[0,0,0,0]];
+    over = false; $("sl_score").textContent = "0"; res.textContent = "";
+    spawn(); spawn(); render();
+  };
+  const end = () => {
+    if (over) return;
+    over = true;
+    const best = Math.max(0, ...grid.flat());
+    res.textContent = "Hết lượt — ô tối đa " + best;
+    award("slide", best, res, btn);
+  };
+  if (window._slKey) document.removeEventListener("keydown", window._slKey);
+  window._slKey = ev => {
+    const map = { ArrowLeft:"left", ArrowRight:"right", ArrowUp:"up", ArrowDown:"down" };
+    const d = map[ev.key];
+    if (d && currentGame === "slide") { ev.preventDefault(); if (!over) { move(d); if (checkOver()) end(); } }
+  };
+  document.addEventListener("keydown", window._slKey);
+  let sx = 0, sy = 0;
+  board.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; });
+  board.addEventListener("pointerup", e => {
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (Math.abs(dx) < 24 && Math.abs(dy) < 24) return;
+    const d = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up");
+    move(d); if (checkOver()) end();
+  });
+  btn.onclick = start;
+  start();
+}
+
+/* ================= Khởi động ================= */
+async function boot() {
+  buildNav();
+  renderHud();
+  navigate("home");
+  CONN = await refreshAll();
+  renderHud();
+  renderHomeDynamic();
+  if (!CONN) toast("Chưa tải được dữ liệu máy chủ — bấm ⚠️ trên thanh trên để thử lại", false);
+}
+boot();
+</script>
+</body>
+</html>

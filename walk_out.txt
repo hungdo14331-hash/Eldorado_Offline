@@ -1,0 +1,57 @@
+﻿[t+0.02s] scene -> ERR:g_sceneinfo is not defined
+[t+1.299s] scene -> S_LOGO
+[t+3.801s] scene -> S_LANG_SELECT
+[t+5.404s] scene -> S_SYNOPSIS
+[t+6.043s] scene -> S_ATTENDANCE
+[t+7.072s] scene -> S_EVENT
+[t+8.013s] scene -> S_MAINMENU
+>>> PLAY click @t+8.021s => {"v":{"startNum":7,"now":"S_MAINMENU"}}
+[t+8.336s] scene -> S_MODE_SELECT
+=== FINAL state ===
+{
+ "v": {
+  "scene": "S_MODE_SELECT",
+  "flagcount": 4,
+  "attFolder": "41_attendance_event",
+  "autoPlugin": 1,
+  "gEnableKey": 1,
+  "ruby": 500,
+  "gold": 412345,
+  "level": 1,
+  "userName": "ELDORADO_OFFLINE_0001"
+ }
+}
+=== SCENE HISTORY ===
+ERR:g_sceneinfo is not defined -> S_LOGO -> S_LANG_SELECT -> S_SYNOPSIS -> S_ATTENDANCE -> S_EVENT -> S_MAINMENU -> S_MODE_SELECT
+=== XHR LOG (30) ===
+{"u":"http://localhost:8023/ELDORADO_WEB/get_app_file.php","s":200,"r":"http://localhost:8023/ELDORADO_WEB/javascript_min/aes.js?13|http://localhost:8023/ELDORADO_WEB/pwsmart.1.3.js?13|http://localhost:8023/ELDORADO_WEB/GoogleAnalytics/google_analytics.js?13|http://localhost:8023/ELDORADO_WE"}
+{"u":"https://ep1.adtrafficquality.google/getconfig/sodar?sv=200&tid=gda&tv=r20260917&st=env&sjk=4492028866266542","s":200,"r":"{\"sodar_query_id\":\"XYutar6DO8uWosUPxY-NYA\",\"injector_basename\":\"sodar2\",\"bg_hash_basename\":\"mjdC0ZSqHv0yQhlTg3d32vMSV0Va8m7zDLbtFMnaXCA\",\"bg_binary\":\"MoUSAUIgPTmFoUWlpUko5MagoLWGPk6kccwhSPL5pJuPx1D7qFmAysFTWS6EwNo73Cx48R"}
+{"u":"http://localhost:8023/ELDORADO_WEB/get_today_pv.php","s":200,"r":"0"}
+{"u":"http://localhost:8023/ELDORADO_WEB/get_server_time.php","s":200,"r":"2026-09-19"}
+{"u":"http://localhost:8023/KR_INPUT/kr_input_with_mouse_email.js?_=1789758299184","s":200,"r":"/********************************************************************\r\n * KR_INPUT\r\n *\r\n * 2017.09.24 busidol.ywlee\r\n * 2017.10.07 1차 버전 완성\r\n * 2019.05.23 한영전환 및 대소문자 추가\r\n * 2020.02.28 마우스 될수 있게 구현하기 ywlee\r\n *\r\n * TV리모컨으"}
+{"u":"http://localhost:8023/ELDORADO_WEB/get_server_timestamp.php","s":200,"r":"1789758289560"}
+{"u":"http://localhost:8023/ELDORADO_WEB/BlackList/check_black_list_db.php","s":200,"r":"{\"result\": \"NONE\", \"STATE\": \"OK\", \"UNIQ_ID\": \"ELDORADO_OFFLINE_0001\"}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/cnm_exist_host_in_server.php","s":200,"r":"{\"STATE\": \"SUCCESS\", \"USER\": \"ELDORADO_OFFLINE_0001\", \"quest\": \"empty\", \"scorewave\": \"0,0\", \"bp\": \"none\", \"user_paid\": \"false\", \"item\": \"none\", \"hard_mode\": \"0||0\", \"attendance_event_folder_name\": \"41_attendance_event\", "}
+{"u":"http://localhost:8023/ELDORADO_WEB/cnm_update_quest_to_server.php","s":200,"r":"QUEST_OK"}
+{"u":"http://localhost:8023/APP_ANALYSIS/day_counter.php","s":200,"r":"0"}
+{"u":"http://localhost:8023/APP_VALIDATE/CHECK_APP_VALIDATE.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/GongJi/get_gongji_all.php","s":200,"r":"[]"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Event/get_my_first_login_date.php","s":200,"r":"2026-09-19 12:00:00"}
+{"u":"http://localhost:8023/ELDORADO_WEB/AutoPlay/get_autoplay.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/gameworld_score/check_eldorado_id.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/attendance_event/attendance_event.php","s":200,"r":"{\"STATE\": \"SUCCESS\", \"EVENT_START_DATE\": \"20260916 00:00:00\", \"EVENT_END_DATE\": \"20261016 23:59:59\", \"EVENT_VIEW_START_DATE\": \"20260916 00:00:00\", \"EVENT_VIEW_END_DATE\": \"20261016 23:59:59\", \"EVENT_NEXT_START_DATE\": \"202"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Counter/daily_run_count.php","s":200,"r":"1"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Mobile_Link/get_cur_run_count.php","s":200,"r":"1"}
+{"u":"http://localhost:8023/ELDORADO_WEB/cnm_update_user_to_server_cry.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Boss/update_boss_tiket_to_server.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/cnm_update_user_to_server_cry.php","s":200,"r":"{}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/attendance_event/attendance_event.php","s":200,"r":"{\"STATE\": \"SUCCESS\", \"EVENT_START_DATE\": \"20260916 00:00:00\", \"EVENT_END_DATE\": \"20261016 23:59:59\", \"EVENT_VIEW_START_DATE\": \"20260916 00:00:00\", \"EVENT_VIEW_END_DATE\": \"20261016 23:59:59\", \"EVENT_NEXT_START_DATE\": \"202"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Charbook/get_ally_list.php","s":200,"r":"0"}
+{"u":"http://localhost:8023/ELDORADO_WEB/MailBoxReward/get_reward2_mailbox.php","s":200,"r":"{\"RESULT\": 0}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Guild/update_guild_inter.php","s":200,"r":"{\"result\": \"ok\", \"data\": \"no_guild\", \"season_data\": null}"}
+{"u":"http://localhost:8023/ELDORADO_WEB/auto_event_system/get_event_info.php","s":200,"r":"{\"STATE\": \"SUCCESS\", \"is_subscribe\": \"no\", \"limited_package_time\": \"0||0\", \"limited_package_buy_num\": \"0,0,0,0\", \"char_package_cnt\": 0, \"special_a_package_cnt\": 0, \"special_b_package_cnt\": 0, \"is_grow_package\": \"no\", \"is"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Mobile_Link/get_cur_run_count.php","s":200,"r":"1"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Mobile_Link/get_cur_run_count.php","s":200,"r":"1"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Mobile_Link/get_cur_run_count.php","s":200,"r":"1"}
+{"u":"http://localhost:8023/ELDORADO_WEB/Mobile_Link/get_cur_run_count.php","s":200,"r":"1"}
+=== JS EXCEPTIONS (0) ===

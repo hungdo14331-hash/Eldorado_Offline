@@ -1,0 +1,30 @@
+/* ui_atlas.css — SINH TU DONG tu atlas.json, khong sua tay.
+ * Chay lai: python build_ui_atlas.py
+ * Nguon: atlas/rubyfarm_anchor_v1.png (1448x1086)
+ * Moi class la mot sprite: kich thuoc px + background-size/position da tinh san.
+ */
+.sp{background-repeat:no-repeat;display:inline-block;flex:none;background-image:url("atlas/rubyfarm_anchor_v1.png")}
+.sp-res-gold{width:23px;height:23px;background-size:144px 108px;background-position:-7px -2px}
+.sp-res-ruby{width:20px;height:22px;background-size:137px 103px;background-position:-33px -2px}
+.sp-res-bp{width:20px;height:23px;background-size:135px 101px;background-position:-56px -1px}
+.sp-res-cloud{width:26px;height:22px;background-size:142px 107px;background-position:-83px -3px}
+.sp-res-ticket{width:28px;height:23px;background-size:148px 111px;background-position:-116px -3px}
+.sp-nav-catch{width:22px;height:18px;background-size:93px 70px;background-position:-12px -18px}
+.sp-game-gold-mine{width:41px;height:33px;background-size:171px 128px;background-position:-22px -33px}
+.sp-nav-memory{width:22px;height:18px;background-size:98px 75px;background-position:-38px -20px}
+.sp-nav-sudoku{width:22px;height:18px;background-size:92px 69px;background-position:-58px -17px}
+.sp-frame-hud{width:557px;height:99px;background-size:1173px 880px;background-position:-53px -461px}
+.sp-btn-primary{width:153px;height:37px;background-size:357px 268px;background-position:-194px -137px}
+@media (max-width:900px){
+.sp-res-gold{width:18px;height:18px;background-size:115px 86px;background-position:-6px -2px}
+.sp-res-ruby{width:17px;height:19px;background-size:116px 86px;background-position:-28px -1px}
+.sp-res-bp{width:16px;height:19px;background-size:110px 83px;background-position:-46px -1px}
+.sp-res-cloud{width:23px;height:19px;background-size:117px 88px;background-position:-68px -2px}
+.sp-res-ticket{width:22px;height:18px;background-size:119px 89px;background-position:-93px -3px}
+.sp-game-gold-mine{width:35px;height:28px;background-size:147px 110px;background-position:-19px -28px}
+}
+@media (max-width:1024px){
+.sp-nav-catch{width:19px;height:15px;background-size:79px 59px;background-position:-10px -15px}
+.sp-nav-memory{width:19px;height:15px;background-size:81px 61px;background-position:-31px -16px}
+.sp-nav-sudoku{width:19px;height:16px;background-size:80px 61px;background-position:-51px -15px}
+}

@@ -1,0 +1,762 @@
+﻿<!DOCTYPE html>
+<!-- html manifest="./cache.appcache" -->
+<html>
+
+<head>
+	<!--meta name="viewport" content="width=1280"/-->
+	<meta name="viewport" content="width=device-width,  initial-scale=1.0 maximum-scale=1 user-scalable=no">
+	<!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
+
+	<meta name="description" content="Find the golden city with your friends! ">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="expires" content="0" />
+
+	<title>El Dorado</title>
+
+	<link rel="stylesheet" href="css/Main.css" type="text/css">
+	<style>
+		/* #game_viewport la noi DUY NHAT chiu trach nhiem scale + can giua.
+		   #div_body ben trong giu nguyen he toa do logic 1280x720. */
+		html, body { background: #000; }
+
+		#game_viewport {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 1280px;
+			height: 720px;
+			transform-origin: 0 0;
+			-webkit-transform-origin: 0 0;
+		}
+	</style>
+	<script type="text/javascript" src="lib/jquery-2.1.3.min.js"></script>
+	<script language="javascript" type="text/javascript" src="loader.js?20210302_3"></script>
+	<script language="javascript" type="text/javascript" src="game_asset_preload.js?20260925_1"></script>
+
+
+
+	<!--  history.back key를 막기 위한 처리 -->
+	<script type="text/javascript">
+		(function (root) {
+			root.addEventListener('keydown', function (e) {
+				if (e.keyCode == 8) {
+					e.preventDefault();
+				}
+
+				if (e.keyCode == 123 /* F12 */) {
+					e.preventDefault();
+					e.returnValue = false;
+					//alert("oh no!");
+				}
+			});
+		}(window));
+
+
+		function click() {
+			if (event.button == 2) {
+
+				//alert("우측버턴 앙돼요~!");
+				event.preventDefault();
+
+			}
+		}
+		document.onmousedown = click;
+
+	</script>
+
+	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+	<script>
+		(adsbygoogle = window.adsbygoogle || []).push({
+			google_ad_client: "ca-pub-9128981968156075",
+			enable_page_level_ads: true
+		});
+	</script>
+
+</head>
+
+<body marginwidth="0" marginheight="0"
+	leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0" scroll="no" ondragstart="return false"
+	draggable="false" onselectstart="return false" oncontextmenu="return false;">
+
+	<img id="SafeZone">
+
+	<div id="game_viewport">
+	<div id="div_body">
+		<div id="S_LOGO_div"></div>
+		<div id="S_SYNOPSIS_div"></div>
+		<div id="S_MAINMENU_div"></div>
+		<div id="S_ATTENDANCE_div"></div>
+		<div id="S_SELECTMAP_div"></div>
+		<div id="S_SELECTSTAGE_div"></div>
+		<!-- <div id="S_USERPAID_div"></div> -->
+		<div id="S_RANKING_div"></div>
+		<div id="S_RANKING_PVP_div"></div>
+		<div id="S_MEDALPOWER_div"></div>
+		<div id="S_MAKETEAM_div"></div>
+		<div id="S_CLEVELUP_div"></div>
+		<div id="S_CLEVELUP_COMPLETE_div"></div>
+		<div id="S_EVOLUTION_COMPLETE_div"></div>
+		<div id="S_UPGRADE_div"></div>
+		<div id="S_UPGRADE_COMPLETE_div"></div>
+		<div id="S_GACHA_div"></div>
+		<div id="S_GACHA_COMPLETE_div"></div>
+		<div id="S_MARKETSTORE_div"></div>
+		<div id="S_EVENT_div"></div>
+		<div id="S_GAME_div"></div>
+
+		<div id="S_QUEST_div"></div>
+		<div id="S_QUESTDETAIL_div"></div>
+
+		<!-- 20170704_yhlee  도감 추가로 인하여 추가합니다. 20191119_chkim-->
+		<div id="S_CHARBOOK_ALLY_div"></div>
+		<div id="S_CHARBOOK_ALLY_POPUP_div"></div>
+		<div id="S_CHARBOOK_ENEMY_div"></div>
+
+		<div id="MM_top">
+			<img id="Img_MM_top_levelbar">
+			<img id="Img_MM_top_goldbar">
+			<img id="Img_MM_top_rubybar">
+			<img id="Img_MM_top_photo">
+			<img id='Img_MM_top_bonus_point'>
+			<div id='MM_top_bonus_point_div'></div>
+
+			<div id="Txt_MM_top_level"></div>
+			<div id="Txt_MM_top_exp"></div>
+			<div id="Img_MM_top_exp_charge">
+				<div id="Img_MM_top_exp_progress"> </div>
+			</div>
+
+			<div id="Txt_MM_top_gold"></div>
+			<div id="Txt_MM_top_ruby"></div>
+		</div> <!-- end of MM_top -->
+		<div id="S_USERGUIDE_div"></div>
+
+		<div id="S_STAGECLEAR_div"></div>
+		<div id="S_STAGEFAIL_div"></div>
+		<div id="S_EVENTPAGE_div"></div>
+		<div id="S_SETTING_div"></div>
+		<div id="S_INPUT_NICKNAME_div"></div>
+		<div id="S_BILLING_HISTORY_div"></div>
+		<div id="S_QUEST_div"></div>
+		<div id="S_QUESTDETAIL_div"></div>
+		<div id="S_POPUPYN_div"></div>
+		<div id="S_GONGJI_div"></div>
+		<div id="S_PAYMENT_CNM_div"></div>
+
+		<div id="S_EXITPOPUP_div"></div>
+		<div id="S_USERPAID_div"></div>
+
+		<div id="effect_div">
+			<canvas id="e_c_div"></canvas>
+		</div>
+		<div id="temp_text"></div>
+		<div id="LOGLOG"></div>
+		<div id="show_frame_num"> </div>
+		<div id="PM_here"></div>
+		<div id="message"></div>
+		<div id="LO_loading" class="loader"></div>
+		<div id="realtime_notice"></div>
+
+		<div class="fb-like" data-layout="button_count" data-action="like" data-size="large" data-show-faces="true"
+			data-share="true" style="left:990px;top:147px;position:absolute;display:none"></div>
+		<!--div id="TESTING"></div -->
+	</div><!-- End of "div_body" -->
+	</div><!-- End of "game_viewport" -->
+
+
+
+	<!-- for FACEBOOK  좋아요, 공유하기 달기 -->
+
+	<!--
+		  Below we include the Login Button social plugin. This button uses
+		  the JavaScript SDK to present a graphical Login button that triggers
+		  the FB.login() function when clicked.
+		-->
+
+	<!-- fb:login-button scope="public_profile,email" onlogin="">
+		</fb:login-button -->
+
+	<!-- div
+			class ="fb-login-button"
+			data-max=rows="1"
+			data-size ="large"
+			data-auto-logout-link = "true"
+			data-show-faces ="true"
+		></div -->
+
+	<div id="status"></div>
+	<!-- for FACEBOOK -->
+	<img id="rotate_screen"></div>
+	<!-- ==== LIEN KET NHANH: TikTok Lines (self-host, khong can khoi-dong lai) ==== -->
+	<style>
+		#quicklinks_resi a, #quicklinks_resi button {
+			padding: 4px 8px; font-size: 7px; border-radius: 13px;
+			opacity: .5; transition: opacity .15s;
+		}
+		#quicklinks_resi a:hover, #quicklinks_resi button:hover {
+			opacity: 1;
+		}
+	</style>
+	<div id="quicklinks_resi" style="position:fixed;left:6px;bottom:8px;z-index:999999;display:flex;flex-direction:column;gap:4px;font-family:Arial,Helvetica,sans-serif;">
+		<button type="button" id="btn_2x" style="background:#3a3a3a;color:#fff;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">⚡ 2x TẮT</button>
+		<a href="../rubyfarm.html" target="_blank"
+			style="background:#7b2b8e;color:#fff;text-align:center;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">🔮 VƯỜN RUBY</a>
+		<a href="../convert.html" target="_blank"
+			style="background:#0e7a5f;color:#fff;text-align:center;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.45);letter-spacing:.3px;">🔄 ĐỔI TN</a>
+	</div>
+
+	<script>
+		/* Fit-to-screen ELDORADO — mot nguon duy nhat cho viewport scaling.
+		   #div_body giu nguyen he toa do logic 1280x720 (moi scene ve bang px
+		   trong hop nay). #game_viewport boc ngoai chi lam 1 viec: scale uniform
+		   + can giua. Khong ghi gi vao #div_body, nen khong xung dot voi
+		   loader.js / util4web.screenAdjust / Main.init_platform_GLO — cac ham
+		   nay chi ghi layout danh tinh 0/0/1280x720 len #div_body. */
+		(function () {
+			var GAME_W = 1280, GAME_H = 720;
+			var vp = document.getElementById("game_viewport");
+			if (!vp) return;
+			var lastW = -1, lastH = -1;
+			function fit() {
+				var vw = window.innerWidth || document.documentElement.clientWidth || GAME_W;
+				var vh = window.innerHeight || document.documentElement.clientHeight || GAME_H;
+				if (vw === lastW && vh === lastH) return;
+				lastW = vw; lastH = vh;
+				var s = Math.min(vw / GAME_W, vh / GAME_H);
+				var L = (vw - GAME_W * s) / 2;
+				var T = (vh - GAME_H * s) / 2;
+				var tf = "translate(" + L + "px," + T + "px) scale(" + s + ")";
+				vp.style.transform = tf;
+				vp.style.webkitTransform = tf;
+			}
+			fit();
+			window.addEventListener("resize", fit);
+			window.addEventListener("orientationchange", fit);
+		})();
+	</script>
+
+	<script>
+		/* Game speed controller — mot nguon duy nhat dieu khien toc do mo phong.
+		   Chi doi cac bien nhip goc cua game (TIMER_INTERVAL, BOSS_TIMER_INTERVAL,
+		   CLOUD_GARDEN_TIMER_INTERVAL). Vong lap cua tung scene tu doc lai bien nay
+		   o moi vong (setTimeout(self, VAR)) nen toc do doi ngay giua tran, khong
+		   can reload va khong sinh vong lap thu hai. Khong boc setTimeout/setInterval
+		   toan trang -> dong ho that, mang, dem nguoc, giao dien giu nguyen 1x. */
+		(function () {
+			if (window.__ELD_SPEED_CTRL__) return;
+			window.__ELD_SPEED_CTRL__ = true;
+
+			var BASE_NAMES = ["TIMER_INTERVAL", "BOSS_TIMER_INTERVAL", "CLOUD_GARDEN_TIMER_INTERVAL"];
+			var base = null;
+			window.gameSpeed = 1;
+
+			function capture() {
+				if (base) return true;
+				for (var i = 0; i < BASE_NAMES.length; i++) {
+					var v = window[BASE_NAMES[i]];
+					if (typeof v !== "number" || v <= 0) return false;
+				}
+				base = {};
+				for (var j = 0; j < BASE_NAMES.length; j++) base[BASE_NAMES[j]] = window[BASE_NAMES[j]];
+				return true;
+			}
+
+			function apply(speed) {
+				if (!capture()) return false;
+				window.gameSpeed = speed === 2 ? 2 : 1;
+				for (var i = 0; i < BASE_NAMES.length; i++) {
+					var name = BASE_NAMES[i];
+					window[name] = window.gameSpeed === 2 ? Math.max(1, Math.round(base[name] / 2)) : base[name];
+				}
+				console.log("[SPEED] gameSpeed=" + window.gameSpeed + " => " +
+					BASE_NAMES.map(function (n) { return n + "=" + window[n]; }).join(", "));
+				return true;
+			}
+			window.setGameSpeed = apply;
+
+			var b = document.getElementById("btn_2x");
+			if (b) {
+				var poll = null;
+				function upd() {
+					b.textContent = window.gameSpeed === 2 ? "⚡ 2x BẬT" : "⚡ 2x TẮT";
+					b.style.background = window.gameSpeed === 2 ? "#8a2c9e" : "#3a3a3a";
+				}
+				b.onclick = function () {
+					var want = window.gameSpeed === 2 ? 1 : 2;
+					if (apply(want)) { upd(); return; }
+					// core chua nap xong (chua co TIMER_INTERVAL): cho roi ap dung y dinh
+					if (!poll) poll = setInterval(function () {
+						if (apply(want)) { clearInterval(poll); poll = null; upd(); }
+					}, 250);
+				};
+				upd();
+			}
+		})();
+	</script>
+	<script>
+		// Item gacha: chọn loại (1=Đồng hồ, 2=Kiếm, 3=Khiên, 4=Cánh) + ép grade B/A/S.
+		// Core item id = [loại][grade][biến thể]; grade hàng chục 5/6/7 = B/A/S.
+		// Không sửa min.js -> override runtime.
+		(function () {
+			function ensureWrap() {
+				var c = window.S_ITEM_GACHA_COMPLETE;
+				if (!c || !c.calculate || c.__eldIG) return;
+				var orig = c.calculate;
+				c.calculate = function () {
+					orig.apply(this, arguments);
+					var sel = window.__item_gacha_type; // 1..4 hoặc undefined
+					var how = (typeof ITEM_GACHA_HOW_MANY === "number") ? ITEM_GACHA_HOW_MANY : 6;
+					for (var n = 1; n <= how; n++) {
+						var r = ITEM_GACHARESULT && ITEM_GACHARESULT[n];
+						if (!r || !r.item_num) continue;
+						var t = r.item_num;
+						var type = Math.floor(t / 100);      // 1..4
+						var v = t % 10;                       // 1..3
+						if (sel) type = sel;
+						var grade = 5 + Math.floor(Math.random() * 3); // 5,6,7 = B,A,S
+						r.item_num = type * 100 + grade * 10 + v;
+					}
+				};
+				c.__eldIG = true;
+				console.log("[ITEM_GACHA] calculate wrapped");
+			}
+			ensureWrap();
+			setInterval(ensureWrap, 500);
+
+			// Chế độ offline không có bảng giá cửa hàng thật, nên popup type 26/27
+			// bị trống giá dù luồng mua đã trừ đúng 1000/9000 Ruby.
+			function ensureRubyPriceDisplay() {
+				var popup = window.S_POPUP_PACKAGE_STORE;
+				if (!popup || !popup.make_box_type_num_17_18 || popup.__eldItemGachaRubyDisplay) return;
+				var makeBox = popup.make_box_type_num_17_18;
+				popup.make_box_type_num_17_18 = function () {
+					var result = makeBox.apply(this, arguments);
+					if (this.type_num === 26 || this.type_num === 27) {
+						var rubyPrice = this.type_num === 26 ? 1000 : 9000;
+						$("#Txt_PPS_package_1")
+							.text(utilGetNumber_withComma(String(rubyPrice)))
+							.css({
+								"box-sizing": "border-box",
+								"padding-left": "42px",
+								"background-image": 'url("' + glo.fun.get_ser_img_url("NEW_UI_2025") +
+									'image/ui/12_gacha/cp_selectionpop_bt_rubyicon.png")',
+								"background-position": "5px center",
+								"background-repeat": "no-repeat",
+								"background-size": "40px 40px"
+							});
+					}
+					return result;
+				};
+				popup.__eldItemGachaRubyDisplay = true;
+				console.log("[ITEM_GACHA] display prices=1000/9000 Ruby");
+			}
+			ensureRubyPriceDisplay();
+			setInterval(ensureRubyPriceDisplay, 500);
+
+			// Panel 4 nút chọn loại, hiện khi mở màn gacha item.
+			var names = ["1 ĐỒNG HỒ", "2 KIẾM", "3 KHIÊN", "4 CÁNH"];
+			var colors = ["#4169e1", "#c0392b", "#1e8449", "#a04000"];
+			var panel = document.createElement("div");
+			panel.id = "item_gacha_type_panel";
+			panel.style.cssText = "position:fixed;left:10px;top:180px;z-index:999999;display:none;" +
+				"flex-direction:column;gap:6px;background:rgba(0,0,0,.55);padding:8px;border-radius:10px;font-family:Arial,Helvetica,sans-serif;";
+			var status = document.createElement("div");
+			status.id = "item_gacha_ep_status";
+			status.style.cssText = "font:bold 12px Arial;color:#fff;text-align:center;padding:3px;border-radius:6px;background:#333;";
+			status.textContent = "EP GRADE: ...";
+			panel.appendChild(status);
+			names.forEach(function (nm, i) {
+				var b = document.createElement("button");
+				b.type = "button";
+				b.textContent = nm;
+				b.dataset.type = i + 1;
+				b.style.cssText = "padding:6px 12px;border:none;border-radius:8px;cursor:pointer;" +
+					"font-size:13px;font-weight:700;color:#fff;background:" + colors[i] + ";box-shadow:0 2px 6px rgba(0,0,0,.5);";
+				b.addEventListener("click", function () {
+					window.__item_gacha_type = Number(this.dataset.type);
+					var all = panel.querySelectorAll("button");
+					for (var j = 0; j < all.length; j++) all[j].style.outline = (all[j] === this) ? "3px solid #fff" : "none";
+					console.log("[ITEM_GACHA] type=" + this.textContent);
+				});
+				panel.appendChild(b);
+			});
+			document.body.appendChild(panel);
+
+			setInterval(function () {
+				var d = document.getElementById("S_ITEM_GACHA_div");
+				var d2 = document.getElementById("S_GACHA_div");
+				var show = window.S_ITEM_GACHA !== undefined &&
+					((d && d.style.display !== "none") ||
+					 (d2 && d2.style.display !== "none" && window.S_GACHA && S_GACHA.item_gacha_mode));
+				panel.style.display = show ? "flex" : "none";
+				var c = window.S_ITEM_GACHA_COMPLETE;
+				var wrapped = !!(c && c.__eldIG);
+				status.textContent = wrapped ? "EP GRADE: BẬT (B/A/S)" : "EP GRADE: TẮT";
+				status.style.background = wrapped ? "#1e8449" : "#b00020";
+			}, 200);
+		})();
+	</script>
+	<script>
+		// Thưởng Quest x10 (Ruby + Gold).
+		// Bảng thưởng nằm hardcode trong min.js (QUEST[i].r_ruby / r_gold) và
+		// CLIENT tự cộng khi người chơi bấm nhận:
+		//     t += QUEST[n].r_ruby[r];  i += QUEST[n].r_gold[r];
+		// nên nhân x10 phải sửa bảng lúc runtime — server không có bảng này.
+		// Không sửa min.js -> override runtime.
+		//
+		// min.js gán lại QUEST[1], QUEST[4], QUEST[9] ở CUỐI bundle, tức là
+		// sau mảng QUEST=[{...}]. Nếu chỉ nhân một lần lúc mảng vừa có, 3 quest
+		// đó sẽ bị ghi đè về số gốc. Vì vậy đánh dấu từng object (__eldQuestX10)
+		// thay vì dùng một cờ chung: object nào chưa nhân thì nhân, object nào
+		// rồi thì bỏ qua, nên thứ tự load không quan trọng.
+		(function () {
+			var MULT = 10;
+			function applyQuestReward() {
+				var Q = window.QUEST;
+				var num = window.QUEST_NUM;
+				if (!Q || typeof num !== "number") return;
+				var scaled = 0;
+				for (var i = 1; i <= num; i++) {
+					var q = Q[i];
+					if (!q || q.__eldQuestX10) continue;
+					q.__eldQuestX10 = true;
+					["r_ruby", "r_gold"].forEach(function (key) {
+						var a = q[key];
+						if (!a || typeof a.length !== "number") return;
+						// a[0] là sentinel -1, code chỉ đọc từ r=1 trở đi.
+						for (var j = 1; j < a.length; j++) a[j] = a[j] * MULT;
+					});
+					scaled++;
+				}
+				if (scaled) console.log("[QUEST] x" + MULT + " ruby/gold cho " + scaled + " quest");
+			}
+			applyQuestReward();
+			setInterval(applyQuestReward, 500);
+		})();
+	</script>
+	<script>
+		// Mặc định tiếng Việt.
+		//
+		// Bản dịch tiếng Việt ĐÃ CÓ SẴN và đầy đủ trong min.js: LANG.setVIETNAM()
+		// gán 2299 khoá TXT (nhiều hơn English 2297, thiếu 0). Menu Settings cũng
+		// đã có sẵn "Tiếng Việt" trong S_SETTING_LANG. Không có gì phải dịch.
+		//
+		// Vấn đề: game không bao giờ hỏi chọn ngôn ngữ, nên mọi tài khoản rơi
+		// về English. Lý do là màn hình chọn bị cờ tắt:
+		//     glo.APP_FEATURE.LANG_SELECT && (S_LANG_SELECT.is_need_lang_select() ...)
+		// LANG_SELECT mặc định = 0 và serve.py không bật, nên nhánh này chạy
+		// không bao giờ. Không bật lại màn hình đó vì S_LANG_SELECT.make_screen()
+		// vẽ div cứng chuẩn TV 1280x720, lệch layout trên PC.
+		//
+		// Cách làm: ép LANG.VIETNAM đúng MỘT LẦN, gắn cờ localStorage. Sau đó
+		// người chơi tự đổi trong Settings → Ngôn ngữ mà không bị patch ghi đè.
+		//
+		// Vòng lặp phải kéo dài vài nhịp (idle >= 6 x 500ms) vì client nạp bundle
+		// SAU window.onload: sau khi ta set, game vẫn chạy
+		//     USER.lang = STORAGE.data1.lang = LANG.get_code_by_data1(t[3], ENGLISH)
+		// trong lúc login và sẽ ghi đè về English. Phải giữ áp đè cho tới khi
+		// giá trị ổn định 3 giây mới dừng. Nếu USER.lang bị đổi sang ngôn ngữ
+		// khác (tức người chơi tự chọn) thì idle reset, không giành quyền.
+		(function () {
+			var FLAG = "eldorado_default_vi_done";
+			var idle = 0, timer = null;
+			// active = patch còn "sống" không. Chỉ sống ở lần tải CHƯA từng áp
+			// dụng; từ lần sau nó im hẳn để không giành quyền với người chơi.
+			var active = false;
+			try { active = localStorage.getItem(FLAG) !== "1"; } catch (e) { active = true; }
+			function markApplied() {
+				try { localStorage.setItem(FLAG, "1"); } catch (e) {}
+			}
+			// Nguyên nhân gốc: client suy ra ngôn ngữ từ save qua
+			//     LANG.get_code_by_data1(t[3], LANG.ENGLISH)
+			// và gán vào USER.lang lúc login. Bọc hàm này lại thì login KHÔNG còn
+			// ghi đè về English nữa. Không chặn thì dù có ép trước, UI đã dựng
+			// xong vẫn kẹt chuỗi English cho tới lần tải sau.
+			function hookLangSource(L) {
+				if (L.get_code_by_data1.__eldVi) return;
+				var orig = L.get_code_by_data1;
+				L.get_code_by_data1 = function () {
+					if (!active) return orig.apply(this, arguments);
+					return L.VIETNAM;
+				};
+				L.get_code_by_data1.__eldVi = true;
+			}
+			function tick() {
+				var L = window.LANG, S = window.STORAGE, U = window.USER;
+				// Chưa nạp xong bundle thì chờ.
+				if (!L || !L.setVIETNAM || !L.VIETNAM || !L.get_code_by_data1 || !S || !S.data1 || !U) return;
+				// Đã áp dụng ở lần tải trước -> không đụng, tôn trọng lựa chọn.
+				if (!active) { clearInterval(timer); return; }
+				hookLangSource(L);
+				if (U.lang === L.VIETNAM) idle++; else idle = 0;
+				if (U.lang !== L.VIETNAM) {
+					U.lang = L.VIETNAM;
+					S.data1.lang = L.VIETNAM;
+					if (typeof L.init === "function") L.init();
+					console.log("[LANG] mac dinh -> Tieng Viet (" + L.VIETNAM + ")");
+				} else {
+					// Giữ data1 khớp để lần phục hồi save sau không rơi về English.
+					S.data1.lang = L.VIETNAM;
+				}
+				// Ổn định 3 giây -> coi như xong, không ép nữa.
+				if (idle >= 6) { active = false; markApplied(); clearInterval(timer); }
+			}
+			tick();
+			timer = setInterval(tick, 500);
+		})();
+	</script>
+	<script>
+		// Sửa lỗi double-encode UTF-8 cho mọi chuỗi trong game.
+		//
+		// Nguyên nhân: file bundle lưu văn bản non-ASCII theo kiểu
+		//     byte gốc -> giải mã latin-1/cp1252 -> mã hoá lại UTF-8
+		// nên trình duyệt (charset=utf-8) hiện ra mojibake:
+		//     "Deck phÃ²ng thá»§"   (đúng ra: "Deck phòng thủ")
+		//     "ì\x88\x98ë¹\x84 ë\x8d±" (đúng ra: "수비 덱")
+		// Không phải thiếu font: font/MuJeogHaeByeongBold.ttf vốn đã không có
+		// trong dự án nên @font-face 404 và game rơi về sans-serif của hệ điều
+		// hành — vẫn đủ dấu tiếng Việt. Chữ khó đọc là do ký tự sai.
+		//
+		// Cách sửa: đi ngược lại 1 bước — lấy mã ký tự latin-1 của chuỗi rồi
+		// giải mã như UTF-8. TextDecoder({fatal:true}) loại chuỗi không phải
+		// mojibake (byte không hợp lệ) thay vì sinh ký tự thay thế.
+		//
+		// Móc vào LANG.init() vì đây là nơi duy nhất nạp lại chuỗi khi đổi ngôn
+		// ngữ: sau mỗi lần init, TXT lại đầy giá trị mojibake mới, nên mỗi lần
+		// sửa đúng MỘT lần là đủ, không bao giờ sửa hai lần. Không cần cờ đánh
+		// dấu từng chuỗi.
+		(function () {
+			function repair(str) {
+				if (typeof str !== "string" || !str) return str;
+				var i, c, n = str.length, bytes = new Uint8Array(n);
+				for (i = 0; i < n; i++) {
+					c = str.charCodeAt(i);
+					// >255 nghĩa là đã có ký tự Unicode thật -> không phải mojibake.
+					// Đây cũng chặn sửa hai lần: sau khi sửa, tiếng Việt còn dấu
+					// tổ hợp (U+1EBF...) hoặc byte không hợp lệ nên không lật ngược lại.
+					if (c > 255) return str;
+					bytes[i] = c;
+				}
+				// byte không hợp lệ -> giữ nguyên, không sinh ký tự thay thế.
+				try {
+					return new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+				} catch (e) {
+					return str;
+				}
+			}
+			function repairAll() {
+				var T = window.TXT, k, n = 0;
+				if (T) {
+					for (k in T) {
+						if (typeof T[k] === "string") {
+							var fixed = repair(T[k]);
+							if (fixed !== T[k]) { T[k] = fixed; n++; }
+						}
+					}
+				}
+				// Mảng ngôn ngữ trong menu Settings cũng bị lỗi ("íêµ­ì´", "Tiáº¿ng Viá»‡t").
+				var L = window.S_SETTING_LANG;
+				if (L && L.length && !L.__eldFixed) {
+					for (var i = 0; i < L.length; i++) L[i] = repair(L[i]);
+					try { L.__eldFixed = true; } catch (e2) {}
+					n++;
+				}
+				return n;
+			}
+			function hook() {
+				var L = window.LANG;
+				if (!L || typeof L.init !== "function") return false;
+				if (!L.init.__eldFix) {
+					var orig = L.init;
+					L.init = function () {
+						var r = orig.apply(this, arguments);
+						try { repairAll(); } catch (e) {}
+						return r;
+					};
+					L.init.__eldFix = true;
+				}
+				// init() có thể đã chạy trước lúc ta tới -> sửa luôn một lần.
+				if (window.TXT && Object.keys(window.TXT).length) {
+					try { repairAll(); } catch (e) {}
+				}
+				return true;
+			}
+			if (hook()) {
+				console.log("[TXT] da sua loi double-encode UTF-8");
+			} else {
+				// Bundle nap sau onload nen thuong phai phai. Phai clear
+				// interval ngay khi hook bat duoc: giu se quet lai ~2299
+				// chuoi TXT moi 500ms ke tu do, ton cuc CPU giua tran.
+				var poll = setInterval(function () {
+					if (hook()) {
+						clearInterval(poll);
+						console.log("[TXT] da sua loi double-encode UTF-8");
+					}
+				}, 500);
+			}
+		})();
+	</script>
+	<script>
+		// Bỏ đứng máy khi trận chờ ảnh quá lâu.
+		//
+		// Nguyên nhân gốc (đã sửa ở serve.py): game đếm ảnh bằng `img.onload`
+		// (LOIMG_CHAR_OUR_NUM.<AC>.cur++ / LOIMG_ETC_OUR.cur++). Ảnh 404 chỉ bắn
+		// `onerror` nên cur không bao giờ đạt tot, mà cổng thì tự hẹn lại vô hạn:
+		//     function interval_test_our(){
+		//         if (đủ) { flag_LOIMG_CHAR_OUR=1; return }
+		//         setTimeout(interval_test_our,100)
+		//     }
+		// Cổng start trận chờ flag==1 nên treo vĩnh viễn giữa trận.
+		//
+		// serve.py giờ trả PNG trong suốt 1x1 cho ảnh thiếu, nên onload luôn bắn
+		// và cổng tự mở. Bản vá này phủ thêm ca TẢI CHẬM (máy nghẽn, mạng lag,
+		// request treo): quá hạn thì tự mở cổng thay vì đứng.
+		//
+		// Bọc hai hàm này là đủ cho MỌI loại trận (thường, boss, daydungeon,
+		// sky) vì tất cả đều đi qua cùng một cặp cổng — không vá từng nơi.
+		//
+		// ponytail: hết hạn thì cho trận chạy tiếp với vài frame vẽ thiếu, thay
+		// vì bật màn hình báo lỗi; thêm thông báo "tải quá lâu" trong game nếu
+		// muốn thấy nguyên nhân ngay trên UI thay vì đọc console.
+		(function () {
+			var TIMEOUT_MS = 15000;   // rộng cho lần tải chậm bình thường
+			var POLL_MS = 250;
+			var deadlines = {};
+
+			function wrap(fnName, flagName, numName) {
+				var orig = window[fnName];
+				if (typeof orig !== "function") return false;
+				// install() chạy lại mỗi vòng poll cho tới khi bundle nạp xong,
+				// nên phải idempotent tránh bọc nhiều tầng.
+				if (orig.__eldGate) return true;
+				var gated = function () {
+					// Cổng đã mở -> gọi gốc (gốc return ngay) và bỏ hạn.
+					if (window[flagName] === 1) {
+						delete deadlines[flagName];
+						return orig.apply(this, arguments);
+					}
+					var now = Date.now();
+					// deadline tính riêng từng cổng và tự arm lại mỗi vòng tải:
+					// game set flag=0 rồi gọi lại loading_our_char cho mỗi wave,
+					// nên một hạn dùng chung sẽ chết ở wave đầu tiên.
+					if (!deadlines[flagName]) deadlines[flagName] = now + TIMEOUT_MS;
+					if (now < deadlines[flagName]) return orig.apply(this, arguments);
+					// Quá hạn: tự mở cổng và KHÔNG gọi gốc, để gốc không hẹn lại.
+					window[flagName] = 1;
+					try {
+						console.warn("[GATE] het han " + flagName + " " + numName +
+							"=" + JSON.stringify(window[numName]));
+					} catch (e) {}
+					return;
+				};
+				gated.__eldGate = true;
+				window[fnName] = gated;
+				return true;
+			}
+
+			function install() {
+				var a = wrap("interval_test_our", "flag_LOIMG_CHAR_OUR", "LOIMG_CHAR_OUR_NUM");
+				var b = wrap("interval_test_your", "flag_LOIMG_CHAR_YOUR", "LOIMG_CHAR_YOUR_NUM");
+				return a && b;
+			}
+
+			if (!install()) {
+				// Bundle nạp sau script này. Phải clear khi bọc xong, nếu không
+				// sẽ thử bọc vô hạn (xem patch mojibake trên cùng file).
+				var poll = setInterval(function () {
+					if (install()) clearInterval(poll);
+				}, POLL_MS);
+			}
+		})();
+	</script>
+	<script>
+		// Không để một ảnh hỏng giết vĩnh viễn vòng lặp trận.
+		//
+		// Bằng chứng thực tế từ console:
+		//   Uncaught InvalidStateError: Failed to execute 'drawImage' ... the
+		//   HTMLImageElement provided is in the 'broken' state.
+		//     at S_GAME.interval_set_your_div
+		//     at S_GAME.move_our_or_enmey
+		//     at S_GAME.interval
+		//
+		// Nguyên nhân: S_GAME.interval tự nối lại bằng setTimeout ở CUỐI hàm:
+		//     S_GAME.interval=function(){
+		//         ...
+		//         S_GAME.move_our_or_enmey(),          // drawImage ném ở đây
+		//         ...
+		//         setTimeout(S_GAME.interval, ...)     // không bao giờ chạy tới
+		//     }
+		// Một ảnh 404/502 đúng một khung làm hỏng cả nhịp game. Rời trận rồi
+		// vào lại thì hết, vì lúc đó asset đã nằm trong cache và không còn
+		// ảnh hỏng nào để ném exception nữa.
+		//
+		// serve.py đã sửa nguồn (ảnh thiếu trả PNG trong suốt 1×1). Bản vá này
+		// gỡ đòn phản công: một ảnh hỏng còn sót lại chỉ bỏ khung hình đó, không
+		// giết game. Chặn ngay tại drawImage vì đó là nơi mọi lệnh vẽ đi qua.
+		//
+		// ponytail: chỉ nuốt đúng ca "ảnh chưa có pixel để vẽ" (broken, hoặc
+		// còn đang tải) và im lặng; mọi lỗi khác vẫn ném lại nguyên vẹn để
+		// không che lỗi thật. Nếu sau này còn lỗi làm treo, bọc try/catch quanh
+		// S_GAME.interval thay vì mở rộng điều kiện nuốt ở drawImage.
+		//
+		// Phải nuốt cả ca "còn đang tải" (complete=false) chứ không chỉ broken:
+		// cổng chờ 15 s ở trên có thể mở cổng khi ảnh chưa tải xong, lúc đó
+		// drawImage cũng ném InvalidStateError và giết loop y hệt. Không nuốt ca
+		// này thì bản vá timeout tự mở ra một đường treo mới.
+		(function () {
+			var proto = CanvasRenderingContext2D.prototype;
+			var orig = proto.drawImage;
+			proto.drawImage = function (img) {
+				try {
+					return orig.apply(this, arguments);
+				} catch (e) {
+					// IMG mà chưa có pixel: complete=false (đang tải) hoặc
+					// naturalWidth=0 (tải lỗi). Bỏ khung hình này, vẽ khung sau.
+					if (img && img.tagName === "IMG"
+							&& (img.complete === false || !img.naturalWidth)) {
+						return;
+					}
+					throw e;
+				}
+			};
+		})();
+	</script>
+	<script>
+		// Autoplay Web PC: gói 7 ngày giá tổng cộng 1000 BP. Core vẫn định tuyến
+
+		// Web PC sang thanh toán tiền thật, nên chỉ override đúng màn này.
+		(function () {
+			var t = setInterval(function () {
+				if (window.AUTOPLAY && window.S_AUTOPLAY_PAID && window.gPLATFORM) {
+					AUTOPLAY.need_bp = 1000;
+					if (gTARGET_PLATFORM === gPLATFORM.WEB_PC && !S_AUTOPLAY_PAID.__eldBp) {
+						var makeScreen = S_AUTOPLAY_PAID.make_screen;
+						var menuRun = S_AUTOPLAY_PAID.menuRun_Run;
+						S_AUTOPLAY_PAID.make_screen = function () {
+							var result = makeScreen.apply(this, arguments);
+							$("#APP_board_text1").text(AUTOPLAY.get_day + " Days");
+							$("#APP_board_text2").text(utilGetNumber_withComma(AUTOPLAY.need_bp + "") + " BP");
+							return result;
+						};
+						S_AUTOPLAY_PAID.menuRun_Run = function () {
+							if (S_AUTOPLAY_PAID.focus !== 1) return menuRun.apply(this, arguments);
+							if (USER.bonus_point < AUTOPLAY.need_bp) {
+								S_AUTOPLAY_PAID.back_mainmenu();
+								utilNotice(TXT.bonus_point_lack, 1.4);
+								return;
+							}
+							S_AUTOPLAY_PAID.yes();
+						};
+						S_AUTOPLAY_PAID.__eldBp = true;
+					}
+					clearInterval(t);
+					console.log("[AUTOPLAY] Web PC package=1000 BP");
+				}
+			}, 200);
+		})();
+	</script>
+
+</body>
+
+</html>
+
