@@ -1386,6 +1386,15 @@ Ponytail được cài ở dạng skill thuần, không cài plugin và hai hook
 - Kiểm tra thực sự đã chạy: kiểm thử hợp đồng ToolShop + RubyFarm đạt **3/3**; `node TESTS/test_rubyfarm_design.js` đạt `rubyfarm design tests: PASS`.
 - Giới hạn/bước tiếp theo: server 8029 vẫn cần restart và trang RubyFarm cần reload (`Ctrl+F5`) để nhận cả backend mới lẫn bộ lọc mới. Không thay đổi số dư hay dữ liệu tài khoản.
 
+### 28/09/2026 — Đưa mã nguồn Eldorado Offline lên GitHub
+
+- Mục tiêu/phạm vi được yêu cầu: xuất bản dự án hiện tại lên repository `https://github.com/hungdo14331-hash/Eldorado_Offline`.
+- Đã xác nhận: remote trước đó chỉ có README; repository cục bộ riêng được khởi tạo trong thư mục dự án, dùng nhánh `main` và không đụng Git ở thư mục Desktop cha.
+- Bảo toàn dữ liệu: `.gitignore` bổ sung loại trừ database, save, log, backup tài khoản, `.venv`, `RAC_FILE`, executable và archive lớn; không đưa dữ liệu tài khoản hoặc save riêng tư lên GitHub.
+- Đã push: commit `c68e83a` (mã nguồn, web, asset, test và tài liệu) và commit `3303541` (ba asset Castle xuất hiện ngay sau đợt push đầu). Remote `origin/main` đã xác nhận ở commit `3303541d0edf724cafe775321d600f69ec317a39c`.
+- Kiểm tra thực sự đã chạy trước khi bàn giao: toàn bộ bộ test Python đạt **275/275**, test thiết kế RubyFarm đạt `PASS`; sau push working tree sạch, chỉ còn các file runtime bị ignore.
+- Giới hạn/bước tiếp theo: repository hiện là snapshot mã nguồn/asset offline; dữ liệu runtime cục bộ vẫn chỉ nằm trên máy. Những file mới phát sinh sau commit này cần commit/push riêng nếu người dùng muốn đồng bộ tiếp.
+
 ## 10. Mẫu cập nhật cho đợt tiếp theo
 
 ### YYYY-MM-DD — Tên đợt
